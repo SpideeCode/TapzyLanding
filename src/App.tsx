@@ -1,4 +1,6 @@
-import { QrCode, Smartphone, Zap, Clock, CreditCard, Users, ArrowRight, Check, LogOut } from 'lucide-react';
+import { useState } from 'react';
+import { QrCode, Smartphone, Zap, Clock, CreditCard, Users, ArrowRight, Check, LogOut, Loader2 } from 'lucide-react';
+import { supabase } from './lib/supabase';
 
 import InteractiveDemo from './components/InteractiveDemo';
 
@@ -7,6 +9,33 @@ const auth = undefined; // or { user: { name: 'Demo User' } }
 const isAuthenticated = Boolean(auth);
 
 export default function App() {
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('loading');
+
+    try {
+      const { error } = await supabase
+        .from('waitlist')
+        .insert([{ email }]);
+
+      if (error) throw error;
+      setStatus('success');
+      setEmail('');
+    } catch (error: any) {
+      console.error('Error:', error);
+      setStatus('error');
+      if (error.code === '23505') {
+        setErrorMessage("Cet email est déjà inscrit sur la liste d'attente !");
+      } else {
+        setErrorMessage("Une erreur est survenue. Veuillez réessayer.");
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-[#EAEAEA] font-sans">
       {/* Header */}
@@ -233,15 +262,49 @@ export default function App() {
       {/* CTA */}
       <section className="container mx-auto px-6 py-20">
         <div className="bg-[#161617] rounded-3xl p-12 lg:p-20 text-center border-2 border-[#2A2A2B]">
-          <h2 className="text-4xl font-bold mb-6 text-[#EAEAEA]">Prêt à révolutionner votre restaurant ?</h2>
+          <h2 className="text-4xl font-bold mb-6 text-[#EAEAEA]">Bientôt disponible</h2>
           <p className="text-xl text-[#A0A0A0] mb-10 max-w-2xl mx-auto">
-            Rejoignez les centaines d'établissements qui font confiance à Tapzy pour moderniser leur service et améliorer l'expérience client.
+            Nous finalisons les derniers détails. Rejoignez la liste d'attente pour être informé du lancement et bénéficier d'avantages exclusifs.
           </p>
-          <button className="px-12 py-5 bg-[#3B82F6] text-white rounded-full font-bold text-lg hover:bg-[#2563EB] hover:shadow-2xl transition-all hover:scale-105">
-            Commencer gratuitement
-          </button>
-          <p className="text-sm text-[#A0A0A0] mt-4">
-            Sans engagement • Configuration en 5 minutes
+
+          {status === 'success' ? (
+            <div className="bg-green-500/10 border border-green-500/20 text-green-400 px-6 py-4 rounded-xl max-w-md mx-auto flex items-center justify-center gap-2">
+              <Check className="w-5 h-5" />
+              <span>Merci ! Vous êtes bien inscrit.</span>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="max-w-md mx-auto">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <input
+                  type="email"
+                  required
+                  placeholder="votre@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="flex-1 px-6 py-4 bg-[#0A0A0B] border border-[#2A2A2B] rounded-xl text-white focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] transition-all placeholder:text-[#525252]"
+                />
+                <button
+                  type="submit"
+                  disabled={status === 'loading'}
+                  className="px-8 py-4 bg-[#3B82F6] text-white rounded-xl font-bold hover:bg-[#2563EB] hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {status === 'loading' ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    'Rejoindre'
+                  )}
+                </button>
+              </div>
+              {status === 'error' && (
+                <p className="text-red-400 text-sm mt-3 text-left">
+                  {errorMessage}
+                </p>
+              )}
+            </form>
+          )}
+
+          <p className="text-sm text-[#A0A0A0] mt-8">
+            Soyez les premiers informés • Pas de spam
           </p>
         </div>
       </section>
