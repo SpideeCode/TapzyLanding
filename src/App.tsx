@@ -14,6 +14,7 @@ import { DashboardOverview as SuperAdminDashboard } from './pages/superadmin/Das
 import { RestaurantManagement } from './pages/superadmin/Restaurants';
 import { StaffManagement as SuperAdminStaff } from './pages/superadmin/Staff';
 import { MenuManagement } from './pages/superadmin/MenuManagement';
+import { PublicMenu } from './pages/PublicMenu';
 
 // Admin Pages
 import { AdminLayout } from './components/layouts/AdminLayout';
@@ -153,6 +154,7 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/m/:slug" element={<PublicMenu />} />
 
             {/* Superadmin Routes (Protected) */}
             <Route path="/superadmin/*" element={

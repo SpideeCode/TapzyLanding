@@ -215,6 +215,10 @@ DROP POLICY IF EXISTS "Superadmin insert restaurants" ON public.restaurants;
 CREATE POLICY "Superadmin insert restaurants" ON public.restaurants FOR INSERT WITH CHECK (get_my_role() = 'superadmin');
 
 -- Client access (Public/Anonymous)
+DROP POLICY IF EXISTS "Public can view restaurants" ON public.restaurants;
+CREATE POLICY "Public can view restaurants" ON public.restaurants
+    FOR SELECT TO anon USING (true);
+
 DROP POLICY IF EXISTS "Public can view menus" ON public.menus_categories;
 CREATE POLICY "Public can view menus" ON public.menus_categories
     FOR SELECT TO anon USING (true);
