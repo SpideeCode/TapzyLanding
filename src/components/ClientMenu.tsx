@@ -85,12 +85,12 @@ export const ClientMenu: React.FC<ClientMenuProps> = ({ restaurantId }) => {
                                     <div className="p-4 flex-1">
                                         <div className="flex justify-between items-start">
                                             <h3 className="font-semibold text-lg">{item.name}</h3>
-                                            <span className="font-bold text-orange-600">{item.price} €</span>
+                                            <span className="font-bold text-blue-600">{item.price} €</span>
                                         </div>
                                         {item.description && (
                                             <p className="text-sm text-gray-500 line-clamp-2 mt-1">{item.description}</p>
                                         )}
-                                        <button className="mt-2 text-xs font-medium px-3 py-1 bg-orange-100 text-orange-700 rounded-full hover:bg-orange-200 transition-colors">
+                                        <button className="mt-2 text-xs font-medium px-3 py-1 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors">
                                             Ajouter au panier
                                         </button>
                                     </div>

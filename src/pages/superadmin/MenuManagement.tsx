@@ -185,7 +185,7 @@ export const MenuManagement: React.FC = () => {
                 <div className="lg:col-span-1 space-y-4">
                     <div className="flex items-center justify-between">
                         <h2 className="text-xl font-black flex items-center space-x-2 text-gray-900">
-                            <LayoutGrid size={22} className={isSuperAdmin ? 'text-blue-600' : 'text-orange-600'} strokeWidth={2.5} />
+                            <LayoutGrid size={22} className="text-blue-600" strokeWidth={2.5} />
                             <span>Catégories</span>
                         </h2>
                         <button
@@ -194,7 +194,7 @@ export const MenuManagement: React.FC = () => {
                                 setCatName('');
                                 setShowCatModal(true);
                             }}
-                            className={`p-1.5 rounded-xl transition-colors ${isSuperAdmin ? 'hover:bg-blue-50 text-blue-600' : 'hover:bg-orange-50 text-orange-600'}`}
+                            className="p-1.5 rounded-xl transition-colors hover:bg-blue-50 text-blue-600"
                         >
                             <Plus size={22} strokeWidth={2.5} />
                         </button>
@@ -216,7 +216,7 @@ export const MenuManagement: React.FC = () => {
                                                 setCatName(cat.name);
                                                 setShowCatModal(true);
                                             }}
-                                            className={`p-1.5 text-gray-400 rounded-lg ${isSuperAdmin ? 'hover:text-blue-600 hover:bg-blue-50' : 'hover:text-orange-600 hover:bg-orange-50'}`}
+                                            className="p-1.5 text-gray-400 rounded-lg hover:text-blue-600 hover:bg-blue-50"
                                         >
                                             <Edit2 size={16} strokeWidth={2.5} />
                                         </button>
@@ -237,7 +237,7 @@ export const MenuManagement: React.FC = () => {
                 <div className="lg:col-span-2 space-y-4">
                     <div className="flex items-center justify-between">
                         <h2 className="text-xl font-black flex items-center space-x-2 text-gray-900">
-                            <List size={22} className={isSuperAdmin ? 'text-blue-600' : 'text-orange-600'} strokeWidth={2.5} />
+                            <List size={22} className="text-blue-600" strokeWidth={2.5} />
                             <span>Plats & Articles</span>
                         </h2>
                         <button
@@ -248,10 +248,7 @@ export const MenuManagement: React.FC = () => {
                                 setItemCatId(categories[0]?.id || '');
                                 setShowItemModal(true);
                             }}
-                            className={`px-4 py-2 rounded-2xl text-sm font-bold transition-all flex items-center space-x-2 shadow-lg active:scale-95 ${isSuperAdmin
-                                ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-500/10'
-                                : 'bg-orange-600 text-white hover:bg-orange-700 shadow-orange-500/10'
-                                }`}>
+                            className="px-4 py-2 rounded-2xl text-sm font-bold transition-all flex items-center space-x-2 shadow-lg active:scale-95 bg-blue-600 text-white hover:bg-blue-700 shadow-blue-500/10">
                             <Plus size={18} strokeWidth={3} />
                             <span>Nouveau Plat</span>
                         </button>
@@ -282,7 +279,7 @@ export const MenuManagement: React.FC = () => {
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 font-black text-gray-900 text-base">
-                                                <span className={isSuperAdmin ? 'text-blue-600' : 'text-orange-600'}>{item.price} €</span>
+                                                <span className="text-blue-600">{item.price} €</span>
                                             </td>
                                             <td className="px-6 py-4 text-right">
                                                 <button
@@ -293,7 +290,7 @@ export const MenuManagement: React.FC = () => {
                                                         setItemCatId(item.category_id);
                                                         setShowItemModal(true);
                                                     }}
-                                                    className={`text-gray-400 p-1.5 rounded-lg mr-2 transition-all ${isSuperAdmin ? 'hover:text-blue-600 hover:bg-blue-50' : 'hover:text-orange-600 hover:bg-orange-50'}`}
+                                                    className="text-gray-400 p-1.5 rounded-lg mr-2 transition-all hover:text-blue-600 hover:bg-blue-50"
                                                 >
                                                     <Edit2 size={16} strokeWidth={2.5} />
                                                 </button>
