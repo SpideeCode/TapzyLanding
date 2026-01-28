@@ -40,7 +40,7 @@ export const StaffLayout: React.FC<StaffLayoutProps> = ({ children }) => {
 
             {/* Sidebar */}
             <aside className={`
-                fixed inset-y-0 left-0 z-50 w-72 bg-white border-r-2 border-slate-50 transform transition-transform duration-300 ease-in-out
+                fixed inset-y-0 left-0 z-50 w-72 bg-white border-r-2 border-slate-200 transform transition-transform duration-300 ease-in-out
                 lg:relative lg:translate-x-0 ${sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}
             `}>
                 <div className="h-full flex flex-col p-8">
@@ -52,7 +52,7 @@ export const StaffLayout: React.FC<StaffLayoutProps> = ({ children }) => {
                             </span>
                             TAPZY <span className="text-blue-600">STAFF</span>
                         </span>
-                        <button className="lg:hidden text-gray-400" onClick={() => setSidebarOpen(false)}>
+                        <button className="lg:hidden text-slate-400" onClick={() => setSidebarOpen(false)}>
                             <X size={24} />
                         </button>
                     </div>
@@ -69,7 +69,7 @@ export const StaffLayout: React.FC<StaffLayoutProps> = ({ children }) => {
                                         flex items-center gap-3 px-5 py-4 rounded-[1.5rem] transition-all
                                         ${isActive
                                             ? 'bg-slate-900 text-white font-black shadow-2xl shadow-slate-900/10 active:scale-95'
-                                            : 'text-gray-400 hover:text-slate-900 hover:bg-gray-50 font-bold'}
+                                            : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50 font-bold'}
                                     `}
                                 >
                                     <item.icon size={20} strokeWidth={isActive ? 3 : 2} />
@@ -80,10 +80,10 @@ export const StaffLayout: React.FC<StaffLayoutProps> = ({ children }) => {
                     </nav>
 
                     {/* Footer / User */}
-                    <div className="mt-auto pt-8 border-t border-slate-50">
+                    <div className="mt-auto pt-8 border-t-2 border-slate-200">
                         <button
                             onClick={handleLogout}
-                            className="flex items-center gap-3 w-full px-5 py-4 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-[1.5rem] transition-all font-black text-[10px] uppercase tracking-widest"
+                            className="flex items-center gap-3 w-full px-5 py-4 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-[1.5rem] transition-all font-black text-[10px] uppercase tracking-widest"
                         >
                             <LogOut size={20} strokeWidth={2.5} />
                             <span>Quitter le service</span>
@@ -95,12 +95,12 @@ export const StaffLayout: React.FC<StaffLayoutProps> = ({ children }) => {
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-w-0">
                 {/* Top Bar (Mobile Only) */}
-                <header className="bg-white/80 backdrop-blur-md border-b-2 border-slate-50 h-20 flex items-center px-6 lg:hidden shrink-0 sticky top-0 z-30">
-                    <button onClick={() => setSidebarOpen(true)} className="p-3 bg-gray-50 rounded-2xl text-slate-900 border border-slate-100 shadow-sm">
+                <header className="bg-white/80 backdrop-blur-md border-b-2 border-slate-200 h-20 flex items-center px-6 lg:hidden shrink-0 sticky top-0 z-30">
+                    <button onClick={() => setSidebarOpen(true)} className="p-3 bg-white rounded-2xl text-slate-900 border-2 border-slate-200 shadow-sm">
                         <MenuIcon size={20} />
                     </button>
                     <span className="ml-4 font-black italic tracking-tighter text-slate-900 uppercase text-sm">Staff Dashboard</span>
-                    <button className="ml-auto p-3 bg-gray-50 rounded-2xl text-slate-900 relative border border-slate-100 shadow-sm">
+                    <button className="ml-auto p-3 bg-white rounded-2xl text-slate-900 relative border-2 border-slate-200 shadow-sm">
                         <Bell size={20} />
                         <div className="absolute top-3 right-3 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></div>
                     </button>

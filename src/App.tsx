@@ -26,6 +26,8 @@ import { RestaurantSettings } from './pages/admin/RestaurantSettings';
 // Staff Pages
 import { StaffLayout } from './components/layouts/StaffLayout';
 import { LiveOrders as StaffOrders } from './pages/staff/LiveOrders';
+import { StaffLogin } from './pages/staff/StaffLogin';
+import { StaffRoute } from './components/auth/StaffRoute';
 
 function ScrollToTop() {
   // Scroll to top on route change unless it's an anchor link
@@ -194,15 +196,19 @@ export default function App() {
               </ProtectedRoute>
             } />
             {/* Staff Routes (Protected) */}
-            <Route path="/staff/:slug/*" element={
-              <ProtectedRoute requiredRole="staff">
+            {/* Staff Routes */}
+            <Route path="/staff/:slug/login" element={<StaffLogin />} />
+
+            <Route element={<StaffRoute />}>
+              <Route path="/staff/:slug/*" element={
                 <StaffLayout>
                   <Routes>
                     <Route index element={<StaffOrders />} />
                   </Routes>
                 </StaffLayout>
-              </ProtectedRoute>
-            } />
+              } />
+            </Route>
+
           </Routes>
         </main>
 

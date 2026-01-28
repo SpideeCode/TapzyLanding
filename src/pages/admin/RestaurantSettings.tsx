@@ -7,7 +7,8 @@ import {
     Store,
     Link as LinkIcon,
     AlertCircle,
-    CheckCircle2
+    CheckCircle2,
+    Lock
 } from 'lucide-react';
 
 interface Restaurant {
@@ -15,6 +16,7 @@ interface Restaurant {
     name: string;
     slug: string;
     logo_url: string | null;
+    staff_access_code: string | null;
 }
 
 export const RestaurantSettings: React.FC = () => {
@@ -27,6 +29,7 @@ export const RestaurantSettings: React.FC = () => {
     const [name, setName] = useState('');
     const [slug, setSlug] = useState('');
     const [logoUrl, setLogoUrl] = useState('');
+    const [staffCode, setStaffCode] = useState('');
 
     useEffect(() => {
         const fetchRestaurant = async () => {
@@ -41,6 +44,7 @@ export const RestaurantSettings: React.FC = () => {
                     setName(res.name);
                     setSlug(res.slug);
                     setLogoUrl(res.logo_url || '');
+                    setStaffCode(res.staff_access_code || '');
                 }
             }
             setLoading(false);
@@ -61,7 +65,8 @@ export const RestaurantSettings: React.FC = () => {
                 .update({
                     name,
                     slug: slug.toLowerCase().replace(/[^a-z0-9-]/g, '-'),
-                    logo_url: logoUrl || null
+                    logo_url: logoUrl || null,
+                    staff_access_code: staffCode || null
                 })
                 .eq('id', restaurant.id);
 
@@ -173,6 +178,31 @@ export const RestaurantSettings: React.FC = () => {
                                 />
                             </div>
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-4 italic">Utilisé pour l'URL de votre menu digital</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Staff Access Section */}
+                <div className="bg-white rounded-[3rem] border-2 border-slate-200 p-10 space-y-10 shadow-sm relative overflow-hidden">
+                    <div className="flex items-center gap-4 border-b-2 border-slate-100 pb-8">
+                        <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-blue-600 border-2 border-white shadow-sm">
+                            <Lock size={24} strokeWidth={2.5} />
+                        </div>
+                        <h2 className="text-xl font-black text-slate-900 italic tracking-tight uppercase">Accès Staff</h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div className="space-y-4">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4 italic">Code PIN (4-6 chiffres)</label>
+                            <input
+                                type="text"
+                                maxLength={6}
+                                value={staffCode}
+                                onChange={(e) => setStaffCode(e.target.value.replace(/\D/g, ''))}
+                                className="w-full bg-white border-2 border-slate-200 rounded-[1.5rem] py-5 px-8 text-slate-900 text-lg font-black italic focus:outline-none focus:border-blue-600 transition-all shadow-sm tracking-widest"
+                                placeholder="1234"
+                            />
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-4 italic">Code utilisé par vos serveurs pour se connecter</p>
                         </div>
                     </div>
                 </div>
