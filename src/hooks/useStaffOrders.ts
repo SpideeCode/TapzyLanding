@@ -58,31 +58,61 @@ export const useStaffOrders = (restaurantId: string) => {
     };
 
     useEffect(() => {
+        if (!restaurantId) {
+            console.log('[Realtime] Waiting for restaurantId...');
+            return;
+        }
+
         fetchOrders();
 
-        if (!restaurantId) return;
+        // Audio notification setup
+        const playNotification = () => {
+            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+            audio.volume = 0.5;
+            audio.play().catch(e => console.log('Audio play failed (waiting for interaction):', e));
+        };
 
-        console.log(`Subscribing to real-time orders for restaurant: ${restaurantId}`);
+        console.log(`[Realtime] Initializing subscription for: ${restaurantId}`);
 
+        // We use a broader subscription and filter in code if needed, 
+        // but Supabase filter should work if REPLICA IDENTITY FULL is set.
         const channel = supabase
             .channel(`staff-orders-${restaurantId}`)
             .on(
                 'postgres_changes',
                 {
-                    event: '*',
+                    event: 'INSERT',
                     schema: 'public',
                     table: 'orders',
                     filter: `restaurant_id=eq.${restaurantId}`,
                 },
                 (payload) => {
-                    console.log('Order Change Received:', payload);
+                    console.log('[Realtime] NEW ORDER DETECTED!', payload);
+                    playNotification();
+                    fetchOrders();
+                }
+            )
+            .on(
+                'postgres_changes',
+                {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'orders',
+                    filter: `restaurant_id=eq.${restaurantId}`,
+                },
+                (payload) => {
+                    console.log('[Realtime] Order Updated:', payload);
                     fetchOrders();
                 }
             )
             .subscribe((status) => {
-                console.log(`Order channel status for ${restaurantId}:`, status);
+                console.log(`[Realtime] Main Channel Status:`, status);
+                if (status === 'SUBSCRIBED') {
+                    console.log('[Realtime] Successfully connected to live stream');
+                }
             });
 
+        // Watch for items (for complex updates)
         const itemsChannel = supabase
             .channel(`staff-items-${restaurantId}`)
             .on(
@@ -93,12 +123,14 @@ export const useStaffOrders = (restaurantId: string) => {
                     table: 'order_items'
                 },
                 () => {
+                    console.log('[Realtime] Items added to an order, refreshing...');
                     fetchOrders();
                 }
             )
             .subscribe();
 
         return () => {
+            console.log(`[Realtime] Cleaning up for: ${restaurantId}`);
             supabase.removeChannel(channel);
             supabase.removeChannel(itemsChannel);
         };
