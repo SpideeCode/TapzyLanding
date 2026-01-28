@@ -20,6 +20,8 @@ import { PublicMenu } from './pages/PublicMenu';
 import { AdminLayout } from './components/layouts/AdminLayout';
 import { AdminDashboardOverview } from './pages/admin/DashboardOverview';
 import { TableManagement } from './pages/admin/Tables';
+import { MenuManagement as AdminMenuManagement } from './pages/admin/MenuManagement';
+import { RestaurantSettings } from './pages/admin/RestaurantSettings';
 
 // Staff Pages
 import { StaffLayout } from './components/layouts/StaffLayout';
@@ -182,10 +184,11 @@ export default function App() {
                 <AdminLayout>
                   <Routes>
                     <Route index element={<AdminDashboardOverview />} />
-                    <Route path="menu" element={<MenuManagement />} />
+                    <Route path="menu" element={<AdminMenuManagement />} />
                     <Route path="tables" element={<TableManagement />} />
-                    <Route path="staff" element={<div className="p-8 text-2xl font-bold bg-white text-gray-900 rounded-3xl">Gestion Staff (À venir)</div>} />
-                    <Route path="orders" element={<div className="p-8 text-2xl font-bold bg-white text-gray-900 rounded-3xl">Commandes (À venir)</div>} />
+                    <Route path="settings" element={<RestaurantSettings />} />
+                    <Route path="staff" element={<div className="p-8 text-2xl font-bold bg-[#111113] text-white rounded-[2.5rem] border border-white/5 italic">Gestion Staff (À venir)</div>} />
+                    <Route path="orders" element={<div className="p-8 text-2xl font-bold bg-[#111113] text-white rounded-[2.5rem] border border-white/5 italic">Commandes (À venir)</div>} />
                   </Routes>
                 </AdminLayout>
               </ProtectedRoute>

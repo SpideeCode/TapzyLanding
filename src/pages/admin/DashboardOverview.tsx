@@ -53,56 +53,92 @@ export const AdminDashboardOverview: React.FC = () => {
     }, []);
 
     const statCards = [
-        { label: 'Commandes', value: stats.orders, icon: ShoppingBag, color: 'bg-orange-500' },
-        { label: 'Plats', value: stats.items, icon: TrendingUp, color: 'bg-blue-500' },
-        { label: 'Tables', value: stats.tables, icon: ClipboardList, color: 'bg-green-500' },
-        { label: 'Catégories', value: stats.categories, icon: AlertCircle, color: 'bg-purple-500' },
+        { label: 'Commandes Total', value: stats.orders, icon: ShoppingBag, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+        { label: 'Plats Actifs', value: stats.items, icon: TrendingUp, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+        { label: 'Tables Config.', value: stats.tables, icon: ClipboardList, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+        { label: 'Catégories', value: stats.categories, icon: AlertCircle, color: 'text-purple-500', bg: 'bg-purple-500/10' },
     ];
 
     return (
-        <div className="space-y-8 animate-in fade-in zoom-in duration-500">
-            <div>
-                <h1 className="text-3xl font-black text-gray-900 tracking-tight">Bonjour !</h1>
-                <p className="text-gray-600 font-medium text-lg">Voici un aperçu de l'activité de votre restaurant.</p>
+        <div className="space-y-12 animate-in fade-in duration-700">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <h1 className="text-4xl font-black text-white tracking-tighter leading-tight italic">
+                        TABLEAU DE <span className="text-blue-600 not-italic">BORD</span>
+                    </h1>
+                    <p className="text-gray-500 font-bold mt-2 uppercase tracking-widest text-xs flex items-center gap-2">
+                        <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                        Aperçu de l'activité du restaurant
+                    </p>
+                </div>
+                <div className="flex items-center gap-4">
+                    <button className="bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-2xl font-black text-sm transition-all border border-white/5 active:scale-95">
+                        EXPORTER DATA
+                    </button>
+                    <button className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-2xl font-black text-sm shadow-xl shadow-blue-500/20 transition-all active:scale-95">
+                        NOUVEAU PLAT
+                    </button>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {statCards.map((stat) => (
-                    <div key={stat.label} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-all group overflow-hidden relative">
-                        <div className={`absolute top-0 right-0 w-32 h-32 ${stat.color} opacity-5 -mr-16 -mt-16 rounded-full group-hover:scale-110 transition-transform`} />
+                    <div key={stat.label} className="bg-[#111113] p-8 rounded-[2.5rem] border border-white/5 shadow-2xl relative overflow-hidden group hover:border-blue-500/30 transition-all duration-500">
+                        <div className={`absolute -right-4 -top-4 w-24 h-24 ${stat.bg} rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700`} />
                         <div className="relative z-10">
-                            <div className={`${stat.color} text-white p-3 rounded-2xl w-fit mb-4 shadow-lg`}>
-                                <stat.icon size={24} />
+                            <div className={`${stat.bg} ${stat.color} p-4 rounded-2xl w-fit mb-6`}>
+                                <stat.icon size={28} strokeWidth={2.5} />
                             </div>
-                            <p className="text-gray-500 font-bold text-sm uppercase tracking-wider">{stat.label}</p>
-                            <h3 className="text-4xl font-black text-gray-900 mt-1">
-                                {loading ? '...' : stat.value}
+                            <p className="text-gray-500 font-black text-[10px] uppercase tracking-[0.2em] mb-1">{stat.label}</p>
+                            <h3 className="text-5xl font-black text-white tracking-tighter">
+                                {loading ? (
+                                    <div className="h-10 w-20 bg-white/5 animate-pulse rounded-lg mt-2" />
+                                ) : stat.value}
                             </h3>
                         </div>
                     </div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-                    <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                        <TrendingUp size={20} className="text-orange-600" />
-                        Commandes Récentes
-                    </h3>
-                    <div className="space-y-4">
-                        <div className="py-12 text-center text-gray-400 font-medium italic bg-gray-50 rounded-2xl border-2 border-dashed border-gray-100">
-                            Aucune commande pour le moment.
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 bg-[#111113] p-10 rounded-[3rem] border border-white/5 shadow-2xl">
+                    <div className="flex items-center justify-between mb-10">
+                        <h3 className="text-2xl font-black text-white tracking-tight flex items-center gap-3 italic">
+                            <TrendingUp size={24} className="text-blue-600 not-italic" />
+                            COMMANDES RÉCENTES
+                        </h3>
+                        <button className="text-xs font-black text-blue-500 uppercase tracking-widest hover:underline">
+                            Voir Tout
+                        </button>
+                    </div>
+
+                    <div className="space-y-6">
+                        <div className="py-20 text-center bg-white/[0.02] rounded-[2rem] border-2 border-dashed border-white/5">
+                            <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                                <ShoppingBag className="text-gray-600" size={32} />
+                            </div>
+                            <p className="text-gray-500 font-bold italic">En attente de vos premières commandes...</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-orange-600 to-orange-500 p-8 rounded-3xl text-white shadow-xl shadow-orange-500/20 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 -mr-32 -mt-32 rounded-full" />
-                    <h3 className="text-2xl font-black mb-4 relative z-10">Votre Menu est prêt ?</h3>
-                    <p className="text-orange-100 font-medium mb-8 text-lg relative z-10">Vérifiez que vos plats sont bien à jour avant le service de ce soir.</p>
-                    <button className="bg-white text-orange-600 font-black px-6 py-3 rounded-2xl shadow-lg hover:bg-orange-50 transition-all active:scale-95 relative z-10">
-                        Gérer le Menu
-                    </button>
+                <div className="space-y-8">
+                    <div className="bg-gradient-to-br from-blue-600 to-indigo-700 p-10 rounded-[3rem] text-white shadow-2xl shadow-blue-500/20 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 -mr-20 -mt-20 rounded-full group-hover:scale-110 transition-transform duration-700" />
+                        <h3 className="text-3xl font-black mb-4 relative z-10 leading-tight italic">BOOSTEZ VOTRE <br />MENU !</h3>
+                        <p className="text-blue-100 font-bold mb-8 text-sm leading-relaxed relative z-10 opacity-80 uppercase tracking-wide">Ajoutez vos spécialités pour attirer plus de clients.</p>
+                        <button className="bg-white text-blue-600 font-black px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all active:scale-95 relative z-10 text-sm">
+                            CONFIGURER
+                        </button>
+                    </div>
+
+                    <div className="bg-[#111113] p-10 rounded-[3rem] border border-white/5 shadow-2xl relative overflow-hidden">
+                        <h3 className="text-xl font-black text-white mb-6 tracking-tight uppercase">Support Client</h3>
+                        <p className="text-gray-500 text-sm font-bold leading-relaxed mb-8 italic">Besoin d'aide pour configurer votre établissement ? Nos experts sont là.</p>
+                        <button className="w-full py-4 rounded-2xl border-2 border-white/5 font-black text-xs uppercase tracking-[0.2em] hover:bg-white/5 transition-all">
+                            Contacter l'aide
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

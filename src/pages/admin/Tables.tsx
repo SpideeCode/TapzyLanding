@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Plus, QrCode, Trash2, Edit2, Filter, X } from 'lucide-react';
+import { Plus, QrCode, Trash2, Edit2, Filter } from 'lucide-react';
 
 interface Table {
     id: string;
@@ -99,164 +99,147 @@ export const TableManagement: React.FC = () => {
     const isSuperAdmin = userProfile?.role === 'superadmin';
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-500">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-12 animate-in fade-in duration-700 text-white pb-20">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-black text-gray-900 tracking-tight">Gestion des Tables</h1>
-                    <p className="text-gray-600 font-medium font-mono text-sm uppercase tracking-wider">Configurez vos accès en restaurant.</p>
+                    <h1 className="text-4xl font-black text-white tracking-tighter leading-tight italic">
+                        TABLES & <span className="text-blue-600 not-italic">QR CODES</span>
+                    </h1>
+                    <p className="text-gray-500 font-bold mt-2 uppercase tracking-widest text-[10px] flex items-center gap-2">
+                        {isSuperAdmin ? 'MODE SUPERADMIN' : 'GESTION DES ACCÈS'}
+                    </p>
                 </div>
-
-                <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex flex-col sm:flex-row gap-6">
                     {isSuperAdmin && (
-                        <div className="flex items-center space-x-3 bg-white p-2 rounded-xl border border-gray-100 shadow-sm">
-                            <Filter size={18} className="text-gray-400 ml-2" />
+                        <div className="bg-white/5 border border-white/5 rounded-2xl px-4 flex items-center gap-2">
+                            <Filter size={18} className="text-gray-500" />
                             <select
                                 value={selectedResId}
                                 onChange={(e) => setSelectedResId(e.target.value)}
-                                className="bg-transparent border-none focus:ring-0 text-sm font-bold text-gray-800 pr-8"
+                                className="bg-transparent border-none text-white font-bold text-sm focus:ring-0 py-3 pr-8"
                             >
                                 {restaurants.map(res => (
-                                    <option key={res.id} value={res.id}>{res.name}</option>
+                                    <option key={res.id} value={res.id} className="bg-[#111113]">{res.name}</option>
                                 ))}
                             </select>
                         </div>
                     )}
-
                     <button
                         onClick={() => {
                             setEditingTable(null);
                             setTableNumber('');
                             setShowModal(true);
                         }}
-                        className={`px-6 py-3 rounded-2xl text-sm font-black transition-all flex items-center justify-center space-x-2 shadow-xl active:scale-95 ${isSuperAdmin
-                                ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-500/20'
-                                : 'bg-orange-600 text-white hover:bg-orange-700 shadow-orange-500/20'
-                            }`}
+                        className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-2xl font-black text-sm shadow-xl shadow-blue-500/20 transition-all active:scale-95 flex items-center gap-2 w-fit"
                     >
-                        <Plus size={18} strokeWidth={3} />
-                        <span>Nouvelle Table</span>
+                        <Plus size={20} strokeWidth={3} /> NOUVELLE TABLE
                     </button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {tables.map((table) => (
-                    <div key={table.id} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-all group relative overflow-hidden">
-                        <div className="flex justify-between items-start mb-6">
-                            <div className={`${isSuperAdmin ? 'bg-blue-50 text-blue-600' : 'bg-orange-50 text-orange-600'} p-4 rounded-2xl`}>
-                                <QrCode size={28} strokeWidth={2.5} />
-                            </div>
-                            <div className="flex space-x-1">
-                                <button
-                                    onClick={() => {
-                                        setEditingTable(table);
-                                        setTableNumber(table.table_number);
-                                        setShowModal(true);
-                                    }}
-                                    className={`p-2.5 text-gray-400 rounded-xl transition-all ${isSuperAdmin ? 'hover:text-blue-600 hover:bg-blue-50' : 'hover:text-orange-600 hover:bg-orange-50'}`}
-                                >
-                                    <Edit2 size={18} strokeWidth={2.5} />
-                                </button>
-                                <button
-                                    onClick={() => handleDelete(table.id)}
-                                    className="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
-                                >
-                                    <Trash2 size={18} strokeWidth={2.5} />
-                                </button>
-                            </div>
+            {/* Tables Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                {tables.map(table => (
+                    <div key={table.id} className="bg-[#111113] rounded-[3rem] border border-white/5 p-8 relative group hover:border-blue-500/30 transition-all duration-500 flex flex-col items-center shadow-2xl overflow-hidden min-h-[320px]">
+                        <div className="absolute -right-4 -top-4 w-24 h-24 bg-blue-600/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                        <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center text-gray-500 mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 group-hover:scale-110 shadow-inner">
+                            <QrCode size={36} strokeWidth={2} />
                         </div>
 
-                        <div className="space-y-1">
-                            <h3 className="text-2xl font-black text-gray-900 tracking-tight">Table {table.table_number}</h3>
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Restaurant ID: {table.restaurant_id.slice(0, 8)}</p>
-                        </div>
+                        <h3 className="text-4xl font-black text-white italic tracking-tighter mb-2">TABLE {table.table_number}</h3>
+                        <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-8 text-center px-4 leading-tight">ID RESTO: {table.restaurant_id.slice(0, 12)}...</p>
 
-                        <div className="mt-8">
-                            <button className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 border-2 ${isSuperAdmin
-                                    ? 'bg-blue-50/50 border-blue-100 text-blue-700 hover:bg-blue-600 hover:text-white hover:border-blue-600'
-                                    : 'bg-orange-50/50 border-orange-100 text-orange-700 hover:bg-orange-600 hover:text-white hover:border-orange-600'
-                                }`}>
-                                <QrCode size={16} strokeWidth={2.5} />
-                                Générer QR Code
+                        <div className="mt-auto w-full pt-8 border-t border-white/5 flex gap-3 z-10">
+                            <button
+                                onClick={() => {
+                                    setEditingTable(table);
+                                    setTableNumber(table.table_number);
+                                    setShowModal(true);
+                                }}
+                                className="flex-1 py-3 bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                            >
+                                <Edit2 size={14} /> ÉDITER
+                            </button>
+                            <button
+                                onClick={() => handleDelete(table.id)}
+                                className="flex-1 py-3 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                            >
+                                <Trash2 size={14} /> SUPPR.
                             </button>
                         </div>
 
-                        {/* Decorative background number */}
-                        <span className="absolute -bottom-4 -right-2 text-9xl font-black text-gray-50 opacity-40 pointer-events-none select-none italic">
+                        <span className="absolute -bottom-6 -right-2 text-[120px] font-black text-white/[0.02] pointer-events-none select-none italic leading-none group-hover:text-blue-600/[0.05] transition-colors">
                             {table.table_number}
                         </span>
                     </div>
                 ))}
 
-                {loading && (
-                    <div className="col-span-full py-12 text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                        <p className="text-gray-400 font-bold italic">Récupération des tables...</p>
+                {tables.length === 0 && !loading && (
+                    <div className="col-span-full py-24 text-center bg-white/[0.01] rounded-[4rem] border-4 border-dashed border-white/5">
+                        <div className="w-20 h-20 bg-white/5 rounded-[2rem] flex items-center justify-center mx-auto mb-8 text-gray-700">
+                            <QrCode size={40} />
+                        </div>
+                        <h3 className="text-2xl font-black text-white mb-2 italic">AUCUNE TABLE</h3>
+                        <p className="text-gray-500 font-bold italic mb-8">Commencez par ajouter votre première table de service.</p>
+                        <button
+                            onClick={() => setShowModal(true)}
+                            className="bg-white/5 hover:bg-white/10 text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all active:scale-95"
+                        >
+                            Créer la table n°1
+                        </button>
                     </div>
                 )}
 
-                {!loading && tables.length === 0 && (
-                    <div className="col-span-full py-20 bg-white rounded-[2.5rem] border-4 border-dashed border-gray-50 text-center flex flex-col items-center">
-                        <div className="bg-gray-50 p-6 rounded-3xl mb-6">
-                            <QrCode size={64} className="text-gray-200" strokeWidth={1} />
-                        </div>
-                        <h3 className="text-2xl font-black text-gray-900 mb-2">Aucune table détectée</h3>
-                        <p className="text-gray-500 font-medium mb-8 max-w-xs mx-auto">Chaque table doit avoir son propre QR code pour permettre la commande automatique.</p>
-                        <button
-                            onClick={() => {
-                                setEditingTable(null);
-                                setTableNumber('');
-                                setShowModal(true);
-                            }}
-                            className={`${isSuperAdmin ? 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/20' : 'bg-orange-600 hover:bg-orange-700 shadow-orange-500/20'} text-white px-8 py-4 rounded-2xl text-sm font-black transition-all flex items-center space-x-2 shadow-xl active:scale-95`}
-                        >
-                            <Plus size={20} strokeWidth={3} />
-                            <span>Ajouter la table n°1</span>
-                        </button>
+                {loading && (
+                    <div className="col-span-full py-24 text-center">
+                        <div className="w-12 h-12 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-6" />
+                        <p className="text-gray-500 font-bold italic">Recherche des tables...</p>
                     </div>
                 )}
             </div>
 
             {/* Modal */}
             {showModal && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-[2.5rem] w-full max-w-md p-10 shadow-2xl animate-in zoom-in duration-200 border border-gray-100">
-                        <div className="flex items-center justify-between mb-8">
-                            <h3 className="text-3xl font-black text-gray-900 italic underline decoration-blue-600 underline-offset-8">
-                                {editingTable ? 'Modifier Table' : 'Nouvelle Table'}
+                <div className="fixed inset-0 bg-black/95 backdrop-blur-xl z-[100] flex items-center justify-center p-6">
+                    <div className="bg-[#111113] w-full max-w-md rounded-[3rem] border border-white/10 shadow-3xl overflow-hidden animate-in zoom-in duration-300">
+                        <div className="p-10 border-b border-white/5 flex items-center justify-between">
+                            <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">
+                                {editingTable ? 'MODIFIER LA TABLE' : 'NOUVELLE TABLE'}
                             </h3>
-                            <button onClick={() => setShowModal(false)} className="p-3 hover:bg-gray-100 rounded-2xl transition-colors">
-                                <X size={24} className="text-gray-400" strokeWidth={3} />
+                            <button onClick={() => setShowModal(false)} className="text-gray-500 hover:text-white">
+                                <X size={28} />
                             </button>
                         </div>
-
-                        <form onSubmit={handleSave} className="space-y-8">
-                            <div className="space-y-3">
-                                <label className="block text-xs font-black text-gray-900 uppercase tracking-[0.2em] ml-1">Numéro de la table</label>
+                        <form onSubmit={handleSave} className="p-10 space-y-10">
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-black text-gray-600 uppercase tracking-[0.2em] ml-4">Numéro de table</label>
                                 <input
                                     type="text"
                                     required
+                                    autoFocus
                                     value={tableNumber}
-                                    onChange={e => setTableNumber(e.target.value)}
-                                    className="w-full px-6 py-5 bg-gray-50 border-2 border-gray-100 rounded-[1.5rem] focus:border-blue-600 focus:bg-white focus:outline-none transition-all font-black text-2xl text-gray-900 placeholder:text-gray-300 shadow-inner"
-                                    placeholder="ex: 12"
+                                    onChange={(e) => setTableNumber(e.target.value)}
+                                    className="w-full bg-white/5 border border-white/5 rounded-[2rem] py-6 px-10 text-white text-3xl font-black italic focus:outline-none focus:border-blue-500 transition-all placeholder:text-gray-800 shadow-inner"
+                                    placeholder="Ex: 12"
                                 />
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-2">Ce numéro sera affiché au client lors de sa commande.</p>
+                                <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest ml-4 italic">Visible sur le menu client</p>
                             </div>
 
-                            <div className="flex space-x-4">
+                            <div className="flex gap-4 pt-4">
                                 <button
                                     type="button"
                                     onClick={() => setShowModal(false)}
-                                    className="flex-1 px-6 py-5 border-2 border-gray-100 text-gray-500 rounded-3xl font-black hover:bg-gray-50 transition-all active:scale-[0.98] uppercase tracking-widest text-xs"
+                                    className="flex-1 py-5 rounded-2xl bg-white/5 text-gray-400 font-black uppercase text-xs tracking-widest transition-all hover:bg-white/10"
                                 >
                                     Fermer
                                 </button>
                                 <button
                                     type="submit"
-                                    className={`${isSuperAdmin ? 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/20' : 'bg-orange-600 hover:bg-orange-700 shadow-orange-500/20'} flex-1 px-6 py-5 text-white rounded-3xl font-black transition-all active:scale-[0.98] shadow-xl uppercase tracking-widest text-xs`}
+                                    className="flex-[2] py-5 rounded-2xl bg-blue-600 text-white font-black uppercase text-xs tracking-widest transition-all hover:bg-blue-500 shadow-xl shadow-blue-500/20"
                                 >
-                                    Enregistrer
+                                    {editingTable ? 'ENREGISTRER' : 'CRÉER'}
                                 </button>
                             </div>
                         </form>
@@ -266,3 +249,7 @@ export const TableManagement: React.FC = () => {
         </div>
     );
 };
+
+const X: React.FC<{ size: number }> = ({ size }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+);
