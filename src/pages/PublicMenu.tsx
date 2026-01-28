@@ -58,7 +58,12 @@ export const PublicMenu: React.FC = () => {
     const [orderSuccess, setOrderSuccess] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const { cart, addToCart, removeFromCart, clearCart, totalItems, totalPrice } = useCart(restaurant?.id || '');
+    const { cart, addToCart, removeFromCart, clearCart, totalItems, totalPrice, isLoaded } = useCart(restaurant?.id || '');
+
+    const handleAddToCart = (item: any) => {
+        console.log('[Cart] Adding item:', item.name);
+        addToCart(item);
+    };
 
     useEffect(() => {
         const fetchAllData = async () => {
@@ -345,8 +350,9 @@ export const PublicMenu: React.FC = () => {
                                             <div className="flex items-center justify-between">
                                                 <span className="text-2xl font-black tracking-tighter">{item.price.toFixed(2)}€</span>
                                                 <button
-                                                    onClick={() => addToCart({ id: item.id, name: item.name, price: item.price, image_url: item.image_url || undefined })}
-                                                    className="bg-[#0A0A0B] text-white p-4 rounded-[1.5rem] hover:bg-blue-600 transition-all shadow-xl active:scale-95"
+                                                    onClick={() => handleAddToCart({ id: item.id, name: item.name, price: item.price, image_url: item.image_url || undefined })}
+                                                    disabled={!isLoaded}
+                                                    className="bg-[#0A0A0B] text-white p-4 rounded-[1.5rem] hover:bg-blue-600 transition-all shadow-xl active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                                                 >
                                                     <Plus size={24} strokeWidth={3} />
                                                 </button>

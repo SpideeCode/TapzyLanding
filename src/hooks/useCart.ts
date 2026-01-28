@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export interface CartItem {
     id: string;
@@ -10,21 +10,42 @@ export interface CartItem {
 
 export const useCart = (restaurantId: string) => {
     const [cart, setCart] = useState<CartItem[]>([]);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const initialLoadDone = useRef(false);
 
-    // Load cart from localStorage on mount
+    // 1. Reset and Load cart when restaurantId changes
     useEffect(() => {
-        const savedCart = localStorage.getItem(`cart_${restaurantId}`);
-        if (savedCart) {
-            try {
-                setCart(JSON.parse(savedCart));
-            } catch (e) {
-                console.error('Failed to parse cart', e);
-            }
+        if (!restaurantId) {
+            setCart([]);
+            setIsLoaded(false);
+            initialLoadDone.current = false;
+            return;
         }
+
+        const loadCart = () => {
+            const savedCart = localStorage.getItem(`cart_${restaurantId}`);
+            if (savedCart) {
+                try {
+                    const parsed = JSON.parse(savedCart);
+                    setCart(Array.isArray(parsed) ? parsed : []);
+                } catch (e) {
+                    console.error('Failed to parse cart', e);
+                    setCart([]);
+                }
+            } else {
+                setCart([]);
+            }
+            setIsLoaded(true);
+            initialLoadDone.current = true;
+        };
+
+        loadCart();
     }, [restaurantId]);
 
-    // Save cart to localStorage whenever it changes
+    // 2. Save cart to localStorage whenever it changes, but ONLY after successful load
     useEffect(() => {
+        if (!initialLoadDone.current || !restaurantId) return;
+
         localStorage.setItem(`cart_${restaurantId}`, JSON.stringify(cart));
     }, [cart, restaurantId]);
 
@@ -54,7 +75,9 @@ export const useCart = (restaurantId: string) => {
 
     const clearCart = () => {
         setCart([]);
-        localStorage.removeItem(`cart_${restaurantId}`);
+        if (restaurantId) {
+            localStorage.removeItem(`cart_${restaurantId}`);
+        }
     };
 
     const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
@@ -67,5 +90,6 @@ export const useCart = (restaurantId: string) => {
         clearCart,
         totalItems,
         totalPrice,
+        isLoaded
     };
 };
