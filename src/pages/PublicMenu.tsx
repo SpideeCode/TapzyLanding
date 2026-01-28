@@ -8,11 +8,9 @@ import {
     Minus,
     Info,
     ArrowLeft,
-    Clock,
-    Star,
     CheckCircle2,
-    ChevronDown,
-    Search
+    Search,
+    MapPin
 } from 'lucide-react';
 
 interface Restaurant {
@@ -37,18 +35,25 @@ interface Item {
     category_id: string;
 }
 
+interface Table {
+    id: string;
+    table_number: string;
+}
+
 export const PublicMenu: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const tableNumber = searchParams.get('t');
 
     const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
     const [items, setItems] = useState<Item[]>([]);
+    const [tables, setTables] = useState<Table[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
     const [showCartModal, setShowCartModal] = useState(false);
+    const [showTableModal, setShowTableModal] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [orderSuccess, setOrderSuccess] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -70,14 +75,16 @@ export const PublicMenu: React.FC = () => {
                 if (resError || !resData) throw new Error('Restaurant introuvable');
                 setRestaurant(resData);
 
-                // 2. Fetch Menu
-                const [catRes, itemRes] = await Promise.all([
+                // 2. Fetch Menu & Tables
+                const [catRes, itemRes, tableRes] = await Promise.all([
                     supabase.from('menus_categories').select('*').eq('restaurant_id', resData.id).order('display_order', { ascending: true }),
-                    supabase.from('items').select('*').eq('restaurant_id', resData.id).eq('is_available', true)
+                    supabase.from('items').select('*').eq('restaurant_id', resData.id).eq('is_available', true),
+                    supabase.from('tables').select('id, table_number').eq('restaurant_id', resData.id).order('table_number')
                 ]);
 
                 setCategories(catRes.data || []);
                 setItems(itemRes.data || []);
+                setTables(tableRes.data || []);
                 if (catRes.data && catRes.data.length > 0) setActiveCategory(catRes.data[0].id);
 
             } catch (err: any) {
@@ -92,19 +99,24 @@ export const PublicMenu: React.FC = () => {
 
     const handleCheckout = async () => {
         if (!restaurant || cart.length === 0) return;
+        if (!tableNumber) {
+            setShowTableModal(true);
+            return;
+        }
+
         setIsSubmitting(true);
         try {
-            let tableId = null;
-            if (tableNumber) {
-                const { data: tableData } = await supabase
-                    .from('tables')
-                    .select('id')
-                    .eq('restaurant_id', restaurant.id)
-                    .eq('table_number', tableNumber)
-                    .single();
-                tableId = tableData?.id || null;
-            }
+            // 1. Get Table ID
+            const { data: tableData } = await supabase
+                .from('tables')
+                .select('id')
+                .eq('restaurant_id', restaurant.id)
+                .eq('table_number', tableNumber)
+                .single();
 
+            const tableId = tableData?.id || null;
+
+            // 2. Create Order
             const { data: order, error: orderError } = await supabase
                 .from('orders')
                 .insert([{
@@ -118,6 +130,7 @@ export const PublicMenu: React.FC = () => {
 
             if (orderError) throw orderError;
 
+            // 3. Create Order Items
             const orderItems = cart.map(item => ({
                 order_id: order.id,
                 item_id: item.id,
@@ -204,12 +217,17 @@ export const PublicMenu: React.FC = () => {
                     <button onClick={() => window.history.back()} className="p-4 bg-white shadow-xl shadow-black/5 rounded-3xl hover:scale-105 transition-all active:scale-95">
                         <ArrowLeft size={20} strokeWidth={3} />
                     </button>
-                    <div className="flex flex-col items-end">
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-300 mb-1">Votre Table</span>
-                        <div className="bg-[#0A0A0B] px-5 py-2 rounded-2xl shadow-xl">
-                            <span className="text-white text-lg font-black italic">{tableNumber || 'Libre'}</span>
+
+                    <button
+                        onClick={() => setShowTableModal(true)}
+                        className="group flex flex-col items-end hover:scale-105 transition-all active:scale-95"
+                    >
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-300 mb-1 group-hover:text-blue-600 transition-colors">Votre Table</span>
+                        <div className="bg-[#0A0A0B] px-5 py-2 rounded-2xl shadow-xl flex items-center gap-2 border border-white/10">
+                            <span className="text-white text-lg font-black italic">{tableNumber || 'Sélectionner'}</span>
+                            <MapPin size={14} className="text-blue-500" />
                         </div>
-                    </div>
+                    </button>
                 </div>
 
                 <div className="relative">
@@ -222,13 +240,9 @@ export const PublicMenu: React.FC = () => {
                                 {restaurant.name}
                             </h1>
                             <div className="flex flex-wrap items-center gap-4 text-xs font-black uppercase tracking-widest text-gray-400">
-                                <div className="flex items-center gap-1.5 text-orange-500 bg-orange-50 px-3 py-1.5 rounded-full">
-                                    <Star size={12} fill="currentColor" />
-                                    <span>4.9 (2k+)</span>
-                                </div>
                                 <div className="flex items-center gap-1.5 text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full">
-                                    <Clock size={12} strokeWidth={3} />
-                                    <span>15-20 min</span>
+                                    <ShoppingBag size={12} strokeWidth={3} />
+                                    <span>Ouvert</span>
                                 </div>
                             </div>
                         </div>
@@ -245,7 +259,7 @@ export const PublicMenu: React.FC = () => {
                     <input
                         type="text"
                         placeholder="Qu'est-ce qui vous fait plaisir ?"
-                        className="w-full bg-[#F5F5F7] border-none rounded-[2rem] py-6 pl-16 pr-8 text-sm font-bold focus:ring-4 focus:ring-blue-100 transition-all placeholder:text-gray-300"
+                        className="w-full bg-[#F5F5F7] border-none rounded-[2rem] py-6 pl-16 pr-8 text-sm font-bold focus:ring-4 focus:ring-blue-100 transition-all placeholder:text-gray-300 shadow-sm"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -283,7 +297,7 @@ export const PublicMenu: React.FC = () => {
                 ))}
             </div>
 
-            {/* Menu List with High-Contrast Design */}
+            {/* Menu List */}
             <div className="px-6 mt-12 space-y-20">
                 {categories.map((category) => {
                     const categoryItems = filteredItems.filter(i => i.category_id === category.id);
@@ -316,7 +330,6 @@ export const PublicMenu: React.FC = () => {
                                                     <ShoppingBag className="text-gray-200" size={32} />
                                                 </div>
                                             )}
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                         </div>
 
                                         <div className="flex-1 flex flex-col justify-center py-2">
@@ -330,9 +343,7 @@ export const PublicMenu: React.FC = () => {
                                             </div>
 
                                             <div className="flex items-center justify-between">
-                                                <div className="flex flex-col">
-                                                    <span className="text-2xl font-black tracking-tighter">{item.price.toFixed(2)}€</span>
-                                                </div>
+                                                <span className="text-2xl font-black tracking-tighter">{item.price.toFixed(2)}€</span>
                                                 <button
                                                     onClick={() => addToCart({ id: item.id, name: item.name, price: item.price, image_url: item.image_url || undefined })}
                                                     className="bg-[#0A0A0B] text-white p-4 rounded-[1.5rem] hover:bg-blue-600 transition-all shadow-xl active:scale-95"
@@ -349,112 +360,105 @@ export const PublicMenu: React.FC = () => {
                 })}
             </div>
 
-            {/* Dynamic Island Floating Cart */}
+            {/* Table Selector Modal */}
+            {showTableModal && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-xl z-[60] flex items-center justify-center p-6 animate-in fade-in duration-300">
+                    <div className="bg-white w-full max-w-md rounded-[3.5rem] p-10 shadow-2xl animate-in zoom-in-95 duration-300">
+                        <div className="flex items-center justify-between mb-8">
+                            <div>
+                                <h3 className="text-3xl font-black text-[#0A0A0B] tracking-tighter italic uppercase leading-none mb-2">Choisir Table</h3>
+                                <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Où vous trouvez-vous ?</p>
+                            </div>
+                            <button onClick={() => setShowTableModal(false)} className="p-4 bg-gray-50 rounded-2xl hover:bg-red-50 hover:text-red-500 transition-colors">
+                                <Plus size={24} className="rotate-45" />
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-4 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
+                            {tables.map((table) => (
+                                <button
+                                    key={table.id}
+                                    onClick={() => {
+                                        setSearchParams({ t: table.table_number });
+                                        setShowTableModal(false);
+                                    }}
+                                    className={`
+                                        aspect-square flex items-center justify-center rounded-[2rem] text-xl font-black italic transition-all active:scale-90
+                                        ${tableNumber === table.table_number
+                                            ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/40'
+                                            : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}
+                                    `}
+                                >
+                                    {table.table_number}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="mt-8 p-6 bg-blue-50 rounded-3xl">
+                            <p className="text-center text-[11px] font-bold text-blue-600 leading-relaxed uppercase tracking-wider">
+                                Sélectionnez votre numéro de table <br /> pour que nous puissions vous servir.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Floating Cart & Cart Modal */}
             {totalItems > 0 && (
                 <div className="fixed bottom-10 left-6 right-6 z-40 animate-in slide-in-from-bottom flex justify-center">
                     <button
                         onClick={() => setShowCartModal(true)}
-                        className="w-full max-w-lg bg-[#0A0A0B] text-white p-5 rounded-[2.5rem] flex items-center justify-between shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] relative overflow-hidden group border border-white/10"
+                        className="w-full max-w-lg bg-[#0A0A0B] text-white p-5 rounded-[2.5rem] flex items-center justify-between shadow-2xl group border border-white/10"
                     >
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                        <div className="flex items-center gap-4 relative z-10 px-2">
+                        <div className="flex items-center gap-4 px-2">
                             <div className="w-12 h-12 bg-white/10 backdrop-blur-xl rounded-2xl flex items-center justify-center font-black italic text-xl">
                                 {totalItems}
                             </div>
-                            <div className="flex flex-col items-start leading-none">
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-1">Votre Sélection</span>
-                                <span className="text-sm font-black italic underline decoration-blue-500 decoration-2 underline-offset-4">VOIR LE PANIER</span>
-                            </div>
+                            <span className="text-sm font-black italic underline decoration-blue-500 decoration-2 underline-offset-4">VOIR PANIER</span>
                         </div>
-                        <div className="relative z-10 bg-white/10 backdrop-blur-xl px-6 py-3 rounded-2xl border border-white/5">
+                        <div className="bg-white/10 backdrop-blur-xl px-6 py-3 rounded-2xl">
                             <span className="text-lg font-black tracking-tighter italic">{totalPrice.toFixed(2)}€</span>
                         </div>
                     </button>
                 </div>
             )}
 
-            {/* Premium Bottom Sheet Cart */}
             {showCartModal && (
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex flex-col justify-end transition-all duration-500">
-                    <div
-                        className="absolute inset-0"
-                        onClick={() => setShowCartModal(false)}
-                    ></div>
-                    <div className="relative bg-[#FDFDFD] rounded-t-[4rem] w-full max-w-2xl mx-auto p-10 pt-4 animate-in slide-in-from-bottom duration-500 shadow-2xl">
-                        {/* Pull Indicator */}
+                    <div className="absolute inset-0" onClick={() => setShowCartModal(false)}></div>
+                    <div className="relative bg-[#FDFDFD] rounded-t-[4rem] w-full max-w-2xl mx-auto p-10 pt-4 animate-in slide-in-from-bottom duration-500">
                         <div className="w-16 h-1.5 bg-gray-100 rounded-full mx-auto mb-12"></div>
-
-                        <div className="flex items-center justify-between mb-12">
-                            <div>
-                                <h3 className="text-4xl font-black text-[#0A0A0B] tracking-tighter italic uppercase leading-none mb-2">Votre Panier</h3>
-                                <p className="text-xs font-black text-gray-300 uppercase tracking-widest">{totalItems} ARTICLES SELECTIONNÉS</p>
-                            </div>
-                            <button
-                                onClick={() => setShowCartModal(false)}
-                                className="p-5 bg-gray-50 rounded-[2rem] hover:bg-red-50 hover:text-red-500 transition-colors group"
-                            >
-                                <ChevronDown size={28} strokeWidth={3} className="text-gray-300 group-hover:text-red-400" />
-                            </button>
-                        </div>
-
+                        <h3 className="text-4xl font-black text-[#0A0A0B] tracking-tighter italic uppercase mb-8">Votre Panier</h3>
                         <div className="space-y-8 max-h-[40vh] overflow-y-auto pr-4 mb-12 custom-scrollbar">
                             {cart.map((item: CartItem) => (
-                                <div key={item.id} className="flex items-center gap-6 group">
+                                <div key={item.id} className="flex items-center gap-6">
                                     <div className="w-20 h-20 rounded-[1.5rem] bg-gray-50 flex-shrink-0 overflow-hidden shadow-lg shadow-black/5">
-                                        {item.image_url ? (
-                                            <img src={item.image_url} className="w-full h-full object-cover" alt="" />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center opacity-20"><ShoppingBag size={24} /></div>
-                                        )}
+                                        {item.image_url ? <img src={item.image_url} className="w-full h-full object-cover" alt="" /> : <div className="w-full h-full" />}
                                     </div>
                                     <div className="flex-1">
                                         <h4 className="text-lg font-black text-[#0A0A0B] tracking-tight mb-1">{item.name}</h4>
-                                        <p className="text-blue-600 font-black italic text-sm">{item.price.toFixed(2)}€ l'unité</p>
+                                        <p className="text-blue-600 font-black italic text-sm">{item.price.toFixed(2)}€</p>
                                     </div>
                                     <div className="flex items-center gap-4 bg-[#F5F5F7] p-2 rounded-[1.5rem]">
-                                        <button
-                                            onClick={() => removeFromCart(item.id)}
-                                            className="w-10 h-10 flex items-center justify-center bg-white rounded-xl shadow-sm text-gray-400 hover:text-red-500 transition-colors active:scale-90"
-                                        >
-                                            <Minus size={16} strokeWidth={4} />
-                                        </button>
+                                        <button onClick={() => removeFromCart(item.id)} className="w-10 h-10 flex items-center justify-center bg-white rounded-xl shadow-sm text-gray-400"><Minus size={16} strokeWidth={4} /></button>
                                         <span className="font-black text-lg min-w-[1.5rem] text-center italic">{item.quantity}</span>
-                                        <button
-                                            onClick={() => addToCart(item)}
-                                            className="w-10 h-10 flex items-center justify-center bg-[#0A0A0B] text-white rounded-xl shadow-sm transition-transform active:scale-90"
-                                        >
-                                            <Plus size={16} strokeWidth={4} />
-                                        </button>
+                                        <button onClick={() => addToCart(item)} className="w-10 h-10 flex items-center justify-center bg-[#0A0A0B] text-white rounded-xl shadow-sm"><Plus size={16} strokeWidth={4} /></button>
                                     </div>
                                 </div>
                             ))}
                         </div>
-
                         <div className="pt-10 border-t-4 border-dashed border-gray-50 space-y-10">
                             <div className="flex items-end justify-between">
                                 <span className="text-xs font-black text-gray-400 uppercase tracking-[0.3em]">Total Final</span>
                                 <span className="text-5xl font-black tracking-tighter italic text-[#0A0A0B]">{totalPrice.toFixed(2)}€</span>
                             </div>
-
                             <button
                                 onClick={handleCheckout}
                                 disabled={isSubmitting}
-                                className="relative w-full overflow-hidden group"
+                                className="w-full bg-[#0A0A0B] text-white py-8 rounded-[2.5rem] flex items-center justify-center gap-4 shadow-2xl transition-all disabled:opacity-50"
                             >
-                                <div className="absolute inset-0 bg-blue-600 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
-                                <div className="relative bg-[#0A0A0B] text-white py-8 rounded-[2.5rem] flex items-center justify-center gap-4 shadow-2xl transition-all disabled:opacity-50">
-                                    <span className="text-sm font-black uppercase tracking-[0.3em]">
-                                        {isSubmitting ? 'TRANSMISSION...' : `COMMANDER TABLE ${tableNumber || '??'}`}
-                                    </span>
-                                    {!isSubmitting && <Plus size={20} className="rotate-45" />}
-                                </div>
+                                <span className="text-sm font-black uppercase tracking-[0.3em]">{isSubmitting ? 'TRANSMISSION...' : `COMMANDER TABLE ${tableNumber || '??'}`}</span>
                             </button>
-
-                            <div className="bg-gray-50 p-6 rounded-[2rem]">
-                                <p className="text-center text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] leading-relaxed">
-                                    Le règlement s'effectue directement auprès de notre personnel <br /> ou via les solutions de paiement intégrées.
-                                </p>
-                            </div>
                         </div>
                     </div>
                 </div>

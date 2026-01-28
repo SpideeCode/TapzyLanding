@@ -21,6 +21,10 @@ import { AdminLayout } from './components/layouts/AdminLayout';
 import { AdminDashboardOverview } from './pages/admin/DashboardOverview';
 import { TableManagement } from './pages/admin/Tables';
 
+// Staff Pages
+import { StaffLayout } from './components/layouts/StaffLayout';
+import { LiveOrders as StaffOrders } from './pages/staff/LiveOrders';
+
 function ScrollToTop() {
   // Scroll to top on route change unless it's an anchor link
   if (!window.location.hash) {
@@ -98,7 +102,9 @@ export default function App() {
         <Routes>
           <Route path="/superadmin/*" element={null} />
           <Route path="/admin/*" element={null} />
+          <Route path="/staff/:slug/*" element={null} />
           <Route path="/login" element={null} />
+          <Route path="/m/*" element={null} />
           <Route path="*" element={
             <header className="container mx-auto px-6 py-6 transition-all duration-300">
               <nav className="flex items-center justify-between">
@@ -184,13 +190,25 @@ export default function App() {
                 </AdminLayout>
               </ProtectedRoute>
             } />
+            {/* Staff Routes (Protected) */}
+            <Route path="/staff/:slug/*" element={
+              <ProtectedRoute requiredRole="staff">
+                <StaffLayout>
+                  <Routes>
+                    <Route index element={<StaffOrders />} />
+                  </Routes>
+                </StaffLayout>
+              </ProtectedRoute>
+            } />
           </Routes>
         </main>
 
         <Routes>
           <Route path="/superadmin/*" element={null} />
           <Route path="/admin/*" element={null} />
+          <Route path="/staff/:slug/*" element={null} />
           <Route path="/login" element={null} />
+          <Route path="/m/*" element={null} />
           <Route path="*" element={
             <footer className="bg-[#0A0A0B] py-12 border-t border-[#1A1A1B]">
               <div className="container mx-auto px-6">
