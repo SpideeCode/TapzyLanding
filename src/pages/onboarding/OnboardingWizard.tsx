@@ -155,7 +155,7 @@ export const OnboardingWizard: React.FC = () => {
                                 <input
                                     type="email"
                                     required
-                                    className="w-full h-14 px-4 bg-slate-50 rounded-xl border-2 border-slate-100 focus:border-blue-600 focus:ring-0 font-bold text-slate-900 transition-all outline-none"
+                                    className="w-full h-12 md:h-14 px-4 bg-slate-50 rounded-xl border-2 border-slate-100 focus:border-blue-600 focus:ring-0 font-bold text-slate-900 transition-all outline-none placeholder:text-slate-300 placeholder:font-medium"
                                     placeholder="jean@restaurant.com"
                                     value={authData.email}
                                     onChange={e => setAuthData({ ...authData, email: e.target.value })}
@@ -166,7 +166,7 @@ export const OnboardingWizard: React.FC = () => {
                                 <input
                                     type="password"
                                     required
-                                    className="w-full h-14 px-4 bg-slate-50 rounded-xl border-2 border-slate-100 focus:border-blue-600 focus:ring-0 font-bold text-slate-900 transition-all outline-none"
+                                    className="w-full h-12 md:h-14 px-4 bg-slate-50 rounded-xl border-2 border-slate-100 focus:border-blue-600 focus:ring-0 font-bold text-slate-900 transition-all outline-none placeholder:text-slate-300 placeholder:font-medium"
                                     placeholder="••••••••"
                                     value={authData.password}
                                     onChange={e => setAuthData({ ...authData, password: e.target.value })}
@@ -207,7 +207,7 @@ export const OnboardingWizard: React.FC = () => {
                                 <input
                                     type="text"
                                     required
-                                    className="w-full h-14 px-4 bg-slate-50 rounded-xl border-2 border-slate-100 focus:border-blue-600 focus:ring-0 font-bold text-slate-900 transition-all outline-none"
+                                    className="w-full h-12 md:h-14 px-4 bg-slate-50 rounded-xl border-2 border-slate-100 focus:border-blue-600 focus:ring-0 font-bold text-slate-900 transition-all outline-none placeholder:text-slate-300 placeholder:font-medium"
                                     placeholder="Le Petit Bistro"
                                     value={restaurantData.name}
                                     onChange={e => setRestaurantData({ ...restaurantData, name: e.target.value, slug: e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '-') })}
@@ -216,11 +216,11 @@ export const OnboardingWizard: React.FC = () => {
                             <div>
                                 <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Identifiant (Slug)</label>
                                 <div className="flex items-center">
-                                    <span className="h-14 flex items-center px-4 bg-slate-100 rounded-l-xl border-y-2 border-l-2 border-slate-100 text-slate-500 font-bold text-sm">tapzy.app/m/</span>
+                                    <span className="h-12 md:h-14 flex items-center px-4 bg-slate-100 rounded-l-xl border-y-2 border-l-2 border-slate-100 text-slate-500 font-bold text-xs md:text-sm whitespace-nowrap">tapzy.app/m/</span>
                                     <input
                                         type="text"
                                         required
-                                        className="flex-1 h-14 px-4 bg-slate-50 rounded-r-xl border-2 border-slate-100 focus:border-blue-600 focus:ring-0 font-bold text-slate-900 transition-all outline-none"
+                                        className="flex-1 h-12 md:h-14 px-4 bg-slate-50 rounded-r-xl border-2 border-l-0 border-slate-100 focus:border-blue-600 focus:border-l-2 focus:ring-0 font-bold text-slate-900 transition-all outline-none placeholder:text-slate-300 placeholder:font-medium min-w-0"
                                         placeholder="le-petit-bistro"
                                         value={restaurantData.slug}
                                         onChange={e => setRestaurantData({ ...restaurantData, slug: e.target.value })}
@@ -229,15 +229,17 @@ export const OnboardingWizard: React.FC = () => {
                             </div>
                         </div>
 
+
+
                         <div className="p-6 bg-blue-50/50 rounded-2xl border-2 border-blue-100/50 space-y-4">
                             <p className="text-xs font-black uppercase tracking-widest text-blue-400">Configuration Rapide (modifiable plus tard)</p>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">Nombre de tables</label>
                                     <input
                                         type="number"
                                         min="1"
-                                        className="w-full h-10 px-3 bg-white rounded-lg border-2 border-slate-100 font-bold text-slate-900"
+                                        className="w-full h-12 px-3 bg-white rounded-lg border-2 border-slate-100 font-bold text-slate-900 focus:border-blue-600 outline-none transition-colors"
                                         value={setupData.tables}
                                         onChange={e => setSetupData({ ...setupData, tables: parseInt(e.target.value) })}
                                     />
@@ -246,7 +248,7 @@ export const OnboardingWizard: React.FC = () => {
                                     <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">1er article (ex: Café)</label>
                                     <input
                                         type="text"
-                                        className="w-full h-10 px-3 bg-white rounded-lg border-2 border-slate-100 font-bold text-slate-900"
+                                        className="w-full h-12 px-3 bg-white rounded-lg border-2 border-slate-100 font-bold text-slate-900 focus:border-blue-600 outline-none transition-colors"
                                         value={setupData.itemName}
                                         onChange={e => setSetupData({ ...setupData, itemName: e.target.value })}
                                     />
@@ -272,6 +274,6 @@ export const OnboardingWizard: React.FC = () => {
             <p className="mt-8 text-slate-400 font-medium text-sm">
                 Une question ? <a href="#" className="text-blue-600 font-bold hover:underline">Contactez le support</a>
             </p>
-        </div>
+        </div >
     );
 };
