@@ -20,14 +20,21 @@ export const LiveOrders: React.FC = () => {
 
     useEffect(() => {
         const resolveRestaurant = async () => {
-            if (!slug) return;
-            const { data: restaurant } = await supabase
-                .from('restaurants')
-                .select('id')
-                .eq('slug', slug)
-                .single();
-
-            if (restaurant) setRestaurantId(restaurant.id);
+            if (slug) {
+                const { data: restaurant } = await supabase
+                    .from('restaurants')
+                    .select('id')
+                    .eq('slug', slug)
+                    .single();
+                if (restaurant) setRestaurantId(restaurant.id);
+            } else {
+                // Admin Context: Fetch from logged user
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    const { data: profile } = await supabase.from('profiles').select('restaurant_id').eq('id', user.id).single();
+                    if (profile?.restaurant_id) setRestaurantId(profile.restaurant_id);
+                }
+            }
         };
         resolveRestaurant();
     }, [slug]);
@@ -71,7 +78,7 @@ export const LiveOrders: React.FC = () => {
     }
 
     return (
-        <div className="p-6 lg:p-10 h-full flex flex-col">
+        <div className="h-full flex flex-col">
             <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                 <div>
                     <h1 className="text-5xl font-black text-slate-900 tracking-tighter italic uppercase leading-none mb-4">

@@ -198,7 +198,7 @@ export default function App() {
                     <Route path="tables" element={<TableManagement />} />
                     <Route path="settings" element={<RestaurantSettings />} />
                     <Route path="staff" element={<div className="p-8 text-2xl font-bold bg-[#111113] text-white rounded-[2.5rem] border border-white/5 italic">Gestion Staff (À venir)</div>} />
-                    <Route path="orders" element={<div className="p-8 text-2xl font-bold bg-[#111113] text-white rounded-[2.5rem] border border-white/5 italic">Commandes (À venir)</div>} />
+                    <Route path="orders" element={<StaffOrders />} />
                   </Routes>
                 </AdminLayout>
               </ProtectedRoute>

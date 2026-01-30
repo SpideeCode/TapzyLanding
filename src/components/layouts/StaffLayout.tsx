@@ -109,7 +109,7 @@ export const StaffLayout: React.FC<StaffLayoutProps> = ({ children }) => {
                     </button>
                 </header>
 
-                <main className="flex-1 overflow-y-auto w-full max-w-[1600px] mx-auto bg-white">
+                <main className="flex-1 overflow-y-auto w-full max-w-[1600px] mx-auto bg-white p-6 lg:p-10">
                     {children}
                 </main>
             </div>
