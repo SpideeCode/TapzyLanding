@@ -338,7 +338,7 @@ export const PublicMenu: React.FC = () => {
 
                                             <div className="flex justify-end pt-2">
                                                 <button
-                                                    onClick={() => addToCart({ id: item.id, name: item.name, price: item.price, image_url: item.image_url || undefined, quantity: 1 })}
+                                                    onClick={() => addToCart({ id: item.id, name: item.name, price: item.price, image_url: item.image_url || undefined })}
                                                     className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-white shadow-md active:scale-90 transition-all font-bold"
                                                     style={{ backgroundColor: primaryColor, color: isLightColor(primaryColor) ? '#000' : '#FFF' }}
                                                 >
@@ -373,7 +373,7 @@ export const PublicMenu: React.FC = () => {
 
             {/* Table Selection Modal */}
             {showTableModal && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
                     <div className={`w-full max-w-sm rounded-3xl p-8 shadow-2xl ${isBgLight ? 'bg-white' : 'bg-slate-900 border border-slate-800'}`}>
                         <div className="flex justify-between items-center mb-6">
                             <h3 className={`text-xl font-bold`}>Numéro de table</h3>
@@ -390,8 +390,8 @@ export const PublicMenu: React.FC = () => {
                                         setShowTableModal(false);
                                     }}
                                     className={`aspect-square rounded-xl font-bold text-lg transition-all ${tableNumber === t.table_number
-                                            ? `text-white shadow-lg scale-105`
-                                            : `${isBgLight ? 'bg-slate-100 hover:bg-slate-200' : 'bg-slate-800 hover:bg-slate-700'}`
+                                        ? `text-white shadow-lg scale-105`
+                                        : `${isBgLight ? 'bg-slate-100 hover:bg-slate-200' : 'bg-slate-800 hover:bg-slate-700'}`
                                         }`}
                                     style={tableNumber === t.table_number ? { backgroundColor: primaryColor, color: isLightColor(primaryColor) ? '#000' : '#FFF' } : { color: fontColor }}
                                 >
