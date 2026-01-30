@@ -48,7 +48,10 @@ export const OnboardingSuccess: React.FC = () => {
     const qrUrl = restaurant ? `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${origin}/m/${restaurant.slug}?table=1` : '';
 
     return (
-        <div className="min-h-screen bg-slate-50 py-12 px-6">
+        <div className="min-h-screen bg-slate-50 py-12 px-6 relative">
+            <a href="/" className="absolute top-6 left-6 text-slate-400 hover:text-slate-900 transition-colors flex items-center gap-2 text-sm font-bold uppercase tracking-widest z-50">
+                ← Accueil
+            </a>
             <div className="max-w-5xl mx-auto space-y-12">
 
                 {/* Header Success */}

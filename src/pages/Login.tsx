@@ -62,7 +62,10 @@ export const Login: React.FC = () => {
     );
 
     return (
-        <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center p-6">
+        <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center p-6 relative">
+            <a href="/" className="absolute top-6 left-6 text-gray-500 hover:text-white transition-colors flex items-center gap-2 text-sm font-medium">
+                ← Retour à l'accueil
+            </a>
             <div className="w-full max-w-md">
                 {/* Logo */}
                 <div className="text-center mb-10">
