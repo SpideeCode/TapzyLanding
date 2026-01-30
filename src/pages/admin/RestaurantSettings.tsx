@@ -17,6 +17,10 @@ interface Restaurant {
     slug: string;
     logo_url: string | null;
     staff_access_code: string | null;
+    banner_url: string | null;
+    primary_color: string | null;
+    background_color: string | null;
+    font_color: string | null;
 }
 
 export const RestaurantSettings: React.FC = () => {
@@ -30,6 +34,10 @@ export const RestaurantSettings: React.FC = () => {
     const [name, setName] = useState('');
     const [slug, setSlug] = useState('');
     const [logoUrl, setLogoUrl] = useState('');
+    const [bannerUrl, setBannerUrl] = useState('');
+    const [primaryColor, setPrimaryColor] = useState('#2563EB');
+    const [backgroundColor, setBackgroundColor] = useState('#FDFDFD');
+    const [fontColor, setFontColor] = useState('#1E293B');
     const [staffCode, setStaffCode] = useState('');
 
     useEffect(() => {
@@ -45,6 +53,10 @@ export const RestaurantSettings: React.FC = () => {
                     setName(res.name);
                     setSlug(res.slug);
                     setLogoUrl(res.logo_url || '');
+                    setBannerUrl(res.banner_url || '');
+                    setPrimaryColor(res.primary_color || '#2563EB');
+                    setBackgroundColor(res.background_color || '#FDFDFD');
+                    setFontColor(res.font_color || '#1E293B');
                     setStaffCode(res.staff_access_code || '');
                 }
             }
@@ -56,25 +68,12 @@ export const RestaurantSettings: React.FC = () => {
     const handleSavePin = async (e: React.MouseEvent) => {
         e.preventDefault();
         if (!restaurant) return;
-
-        console.log('Attempting to save PIN:', { id: restaurant.id, code: staffCode });
         setSavingPin(true);
         setMessage(null);
-
         try {
-            console.log('Calling RPC update_staff_access_code with:', staffCode);
-            const { data, error } = await supabase.rpc('update_staff_access_code', {
-                new_code: staffCode || null
-            });
-
+            const { data, error } = await supabase.rpc('update_staff_access_code', { new_code: staffCode || null });
             if (error) throw error;
-
-            console.log('RPC Result:', data);
-
-            if (data && !data.success) {
-                throw new Error(data.message || 'Erreur inconnue');
-            }
-
+            if (data && !data.success) throw new Error(data.message || 'Erreur inconnue');
             setMessage({ type: 'success', text: 'Code PIN mis à jour avec succès !' });
         } catch (error: any) {
             console.error('Error saving PIN:', error);
@@ -97,7 +96,11 @@ export const RestaurantSettings: React.FC = () => {
                 .update({
                     name,
                     slug: slug.toLowerCase().replace(/[^a-z0-9-]/g, '-'),
-                    logo_url: logoUrl || null
+                    logo_url: logoUrl || null,
+                    banner_url: bannerUrl || null,
+                    primary_color: primaryColor,
+                    background_color: backgroundColor,
+                    font_color: fontColor
                 })
                 .eq('id', restaurant.id);
 
@@ -209,6 +212,70 @@ export const RestaurantSettings: React.FC = () => {
                                 />
                             </div>
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-4 italic">Utilisé pour l'URL de votre menu digital</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Branding Customization Section */}
+                <div className="bg-white rounded-[3rem] border-2 border-slate-200 p-10 space-y-10 shadow-sm relative overflow-hidden">
+                    <div className="flex items-center gap-4 border-b-2 border-slate-100 pb-8">
+                        <div className="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 border-2 border-white shadow-sm">
+                            <Store size={24} strokeWidth={2.5} />
+                        </div>
+                        <h2 className="text-xl font-black text-slate-900 italic tracking-tight uppercase">Personnalisation</h2>
+                    </div>
+
+                    <div className="space-y-8">
+                        {/* Banner */}
+                        <div className="space-y-4">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4 italic">Bannière (URL)</label>
+                            <input
+                                type="url"
+                                value={bannerUrl}
+                                onChange={(e) => setBannerUrl(e.target.value)}
+                                className="w-full bg-white border-2 border-slate-200 rounded-[1.5rem] py-4 px-8 text-slate-900 font-bold focus:outline-none focus:border-purple-600 transition-all placeholder:text-gray-300 shadow-sm"
+                                placeholder="https://votre-site.com/banniere.jpg"
+                            />
+                        </div>
+
+                        {/* Colors */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4 italic">Couleur Principale</label>
+                                <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-[1.5rem] border-2 border-slate-100">
+                                    <input
+                                        type="color"
+                                        value={primaryColor}
+                                        onChange={(e) => setPrimaryColor(e.target.value)}
+                                        className="w-16 h-16 rounded-2xl border-none cursor-pointer p-1 bg-white shadow-sm"
+                                    />
+                                    <span className="font-black text-slate-600 uppercase tracking-widest text-sm">{primaryColor}</span>
+                                </div>
+                            </div>
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4 italic">Couleur de Fond</label>
+                                <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-[1.5rem] border-2 border-slate-100">
+                                    <input
+                                        type="color"
+                                        value={backgroundColor}
+                                        onChange={(e) => setBackgroundColor(e.target.value)}
+                                        className="w-16 h-16 rounded-2xl border-none cursor-pointer p-1 bg-white shadow-sm"
+                                    />
+                                    <span className="font-black text-slate-600 uppercase tracking-widest text-sm">{backgroundColor}</span>
+                                </div>
+                            </div>
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4 italic">Couleur du Texte</label>
+                                <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-[1.5rem] border-2 border-slate-100">
+                                    <input
+                                        type="color"
+                                        value={fontColor}
+                                        onChange={(e) => setFontColor(e.target.value)}
+                                        className="w-16 h-16 rounded-2xl border-none cursor-pointer p-1 bg-white shadow-sm"
+                                    />
+                                    <span className="font-black text-slate-600 uppercase tracking-widest text-sm">{fontColor}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

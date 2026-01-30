@@ -31,12 +31,14 @@ const navigation = [
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [restaurantSlug, setRestaurantSlug] = useState<string | null>(null);
+    const [userEmail, setUserEmail] = useState<string | null>(null);
     const location = useLocation();
 
     React.useEffect(() => {
-        const getSlug = async () => {
+        const getData = async () => {
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
+                setUserEmail(user.email || null);
                 const { data: profile } = await supabase.from('profiles').select('restaurant_id').eq('id', user.id).single();
                 if (profile?.restaurant_id) {
                     const { data: rest } = await supabase.from('restaurants').select('slug').eq('id', profile.restaurant_id).single();
@@ -44,7 +46,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                 }
             }
         };
-        getSlug();
+        getData();
     }, []);
 
     const handleLogout = async () => {
@@ -161,7 +163,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                                     AD
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-sm font-black text-slate-900 leading-none">Administrateur</span>
+                                    <span className="text-sm font-black text-slate-900 leading-none truncate max-w-[150px]" title={userEmail || 'Administrateur'}>
+                                        {userEmail || 'Administrateur'}
+                                    </span>
                                     <span className="text-[10px] font-bold text-emerald-600 mt-1 uppercase tracking-widest">En ligne</span>
                                 </div>
                             </div>

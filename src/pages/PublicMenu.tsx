@@ -7,17 +7,23 @@ import {
     Plus,
     Minus,
     Info,
-    ArrowLeft,
     CheckCircle2,
     Search,
-    MapPin
+    MapPin,
+    X,
+    Clock
 } from 'lucide-react';
 
+// --- Types ---
 interface Restaurant {
     id: string;
     name: string;
     logo_url: string | null;
     slug: string;
+    banner_url: string | null;
+    primary_color: string | null;
+    background_color: string | null;
+    font_color: string | null;
 }
 
 interface Category {
@@ -33,12 +39,25 @@ interface Item {
     price: number;
     image_url: string | null;
     category_id: string;
+    is_available: boolean;
 }
 
 interface Table {
     id: string;
     table_number: string;
 }
+
+// --- Helpers ---
+const isLightColor = (hex: string | null) => {
+    if (!hex) return true;
+    const c = hex.substring(1);
+    const rgb = parseInt(c, 16);
+    const r = (rgb >> 16) & 0xff;
+    const g = (rgb >> 8) & 0xff;
+    const b = (rgb >> 0) & 0xff;
+    const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b; // SMPTE C-Y value
+    return luma > 128; // Standard threshold
+};
 
 export const PublicMenu: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -49,6 +68,7 @@ export const PublicMenu: React.FC = () => {
     const [categories, setCategories] = useState<Category[]>([]);
     const [items, setItems] = useState<Item[]>([]);
     const [tables, setTables] = useState<Table[]>([]);
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -60,27 +80,18 @@ export const PublicMenu: React.FC = () => {
 
     const { cart, addToCart, removeFromCart, clearCart, totalItems, totalPrice, isLoaded } = useCart(restaurant?.id || '');
 
-    const handleAddToCart = (item: any) => {
-        console.log('[Cart] Adding item:', item.name);
-        addToCart(item);
-    };
-
+    // --- Fetch Data ---
     useEffect(() => {
         const fetchAllData = async () => {
             if (!slug) return;
             setLoading(true);
             try {
-                // 1. Fetch Restaurant
-                const { data: resData, error: resError } = await supabase
-                    .from('restaurants')
-                    .select('*')
-                    .eq('slug', slug)
-                    .single();
-
+                // 1. Restaurant
+                const { data: resData, error: resError } = await supabase.from('restaurants').select('*').eq('slug', slug).single();
                 if (resError || !resData) throw new Error('Restaurant introuvable');
                 setRestaurant(resData);
 
-                // 2. Fetch Menu & Tables
+                // 2. Menu data
                 const [catRes, itemRes, tableRes] = await Promise.all([
                     supabase.from('menus_categories').select('*').eq('restaurant_id', resData.id).order('display_order', { ascending: true }),
                     supabase.from('items').select('*').eq('restaurant_id', resData.id).eq('is_available', true),
@@ -98,10 +109,11 @@ export const PublicMenu: React.FC = () => {
                 setLoading(false);
             }
         };
-
         fetchAllData();
     }, [slug]);
 
+
+    // --- Checkout Logic ---
     const handleCheckout = async () => {
         if (!restaurant || cart.length === 0) return;
         if (!tableNumber) {
@@ -111,31 +123,18 @@ export const PublicMenu: React.FC = () => {
 
         setIsSubmitting(true);
         try {
-            // 1. Get Table ID
-            const { data: tableData } = await supabase
-                .from('tables')
-                .select('id')
-                .eq('restaurant_id', restaurant.id)
-                .eq('table_number', tableNumber)
-                .single();
-
+            const { data: tableData } = await supabase.from('tables').select('id').eq('restaurant_id', restaurant.id).eq('table_number', tableNumber).single();
             const tableId = tableData?.id || null;
 
-            // 2. Create Order
-            const { data: order, error: orderError } = await supabase
-                .from('orders')
-                .insert([{
-                    restaurant_id: restaurant.id,
-                    table_id: tableId,
-                    total_price: totalPrice,
-                    status: 'pending'
-                }])
-                .select()
-                .single();
+            const { data: order, error: orderError } = await supabase.from('orders').insert([{
+                restaurant_id: restaurant.id,
+                table_id: tableId,
+                total_price: totalPrice,
+                status: 'pending'
+            }]).select().single();
 
             if (orderError) throw orderError;
 
-            // 3. Create Order Items
             const orderItems = cart.map(item => ({
                 order_id: order.id,
                 item_id: item.id,
@@ -143,332 +142,334 @@ export const PublicMenu: React.FC = () => {
                 unit_price: item.price
             }));
 
-            const { error: itemsError } = await supabase
-                .from('order_items')
-                .insert(orderItems);
-
+            const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
             if (itemsError) throw itemsError;
 
             setOrderSuccess(true);
             clearCart();
             setShowCartModal(false);
         } catch (err: any) {
-            console.error('Checkout error:', err);
-            alert('Erreur lors de la commande: ' + err.message);
+            alert('Erreur: ' + err.message);
         } finally {
             setIsSubmitting(false);
         }
     };
 
+    // --- Derived State & Styles ---
     const filteredItems = items.filter(item =>
         item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.description?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    // Dynamic Theming
+    const primaryColor = restaurant?.primary_color || '#000000';
+    const bgColor = restaurant?.background_color || '#FFFFFF';
+    const fontColor = restaurant?.font_color || '#1E293B';
+    const isBgLight = isLightColor(bgColor);
+
+    // UI Constants
+    const cardBg = isBgLight ? 'bg-white' : 'bg-white/10';
+    const cardBorder = isBgLight ? 'border-gray-100' : 'border-white/10';
+    const inputBg = isBgLight ? 'bg-gray-100' : 'bg-white/10';
+
+    // --- Render Loading ---
     if (loading) return (
-        <div className="min-h-screen bg-[#FDFDFD] flex items-center justify-center p-6">
-            <div className="w-full max-w-lg space-y-8 animate-pulse">
-                <div className="h-64 bg-gray-100 rounded-[3rem]"></div>
-                <div className="h-12 bg-gray-100 rounded-2xl w-3/4"></div>
-                <div className="space-y-4">
-                    <div className="h-32 bg-gray-50 rounded-[2.5rem]"></div>
-                    <div className="h-32 bg-gray-50 rounded-[2.5rem]"></div>
-                </div>
-            </div>
+        <div className={`min-h-screen flex items-center justify-center ${isBgLight ? 'bg-white' : 'bg-slate-900'}`}>
+            <div className="w-8 h-8 border-4 border-current border-t-transparent rounded-full animate-spin opacity-20"></div>
         </div>
     );
 
-    if (orderSuccess) return (
-        <div className="min-h-screen bg-[#FDFDFD] flex flex-col items-center justify-center p-8 text-center">
-            <div className="relative mb-12">
-                <div className="absolute inset-0 bg-emerald-500 blur-3xl opacity-20 scale-150"></div>
-                <div className="relative bg-emerald-500 p-8 rounded-[3rem] shadow-2xl shadow-emerald-500/40 animate-bounce">
-                    <CheckCircle2 size={72} className="text-white" />
-                </div>
-            </div>
-            <h1 className="text-5xl font-black text-[#0A0A0B] mb-6 tracking-tighter leading-none italic">
-                C'EST PARTI !
-            </h1>
-            <p className="text-xl font-bold text-gray-400 mb-12 max-w-sm leading-relaxed px-4">
-                Votre commande est déjà en cuisine. On vous sert ça tout chaud !
-            </p>
-            <button
-                onClick={() => setOrderSuccess(false)}
-                className="w-full max-w-xs py-6 bg-[#0A0A0B] text-white rounded-[2rem] font-black uppercase tracking-[0.2em] shadow-2xl active:scale-95 transition-all text-sm"
-            >
-                Revenir au menu
-            </button>
-        </div>
-    );
-
+    // --- Render Error ---
     if (error || !restaurant) return (
         <div className="min-h-screen bg-white flex flex-col items-center justify-center p-8 text-center">
-            <div className="bg-red-50 p-6 rounded-full mb-8">
-                <Info size={48} className="text-red-500" />
+            <Info size={48} className="text-gray-300 mb-4" />
+            <p className="text-gray-500 font-medium">{error || "Menu introuvable"}</p>
+        </div>
+    );
+
+    // --- Render Success ---
+    if (orderSuccess) return (
+        <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center transition-colors duration-500" style={{ backgroundColor: bgColor, color: fontColor }}>
+            <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center text-white shadow-xl mb-6 animate-bounce">
+                <CheckCircle2 size={40} />
             </div>
-            <h1 className="text-3xl font-black text-gray-900 mb-4 tracking-tighter italic">OUPS !</h1>
-            <p className="text-gray-400 mb-10 max-w-xs font-bold leading-relaxed">{error || "Ce restaurant n'existe pas ou le lien est cassé."}</p>
-            <button onClick={() => window.location.href = '/'} className="px-10 py-5 bg-[#0A0A0B] text-white rounded-2xl font-black italic tracking-widest uppercase text-xs">
-                Accueil Tapzy
+            <h1 className="text-3xl font-bold mb-4">Commande Envoyée !</h1>
+            <p className="mb-8 max-w-xs mx-auto opacity-75">On s'occupe de tout. Détendez-vous, ça arrive.</p>
+            <button
+                onClick={() => setOrderSuccess(false)}
+                className="px-8 py-3 rounded-xl font-bold text-white shadow-lg active:scale-95 transition-transform"
+                style={{ backgroundColor: primaryColor }}
+            >
+                Retour au menu
             </button>
         </div>
     );
 
+    // --- Main Render ---
     return (
-        <div className="min-h-screen bg-[#FDFDFD] text-[#0A0A0B] font-sans overflow-x-hidden pb-40">
-            {/* Ultra-Premium Hero */}
-            <header className="relative px-6 pt-12 pb-8">
-                <div className="flex items-center justify-between mb-10">
-                    <button onClick={() => window.history.back()} className="p-4 bg-white shadow-xl shadow-black/5 rounded-3xl hover:scale-105 transition-all active:scale-95">
-                        <ArrowLeft size={20} strokeWidth={3} />
-                    </button>
+        <div className={`min-h-screen font-sans selection:bg-black/10 transition-colors duration-300`} style={{ backgroundColor: bgColor, color: fontColor }}>
 
-                    <button
-                        onClick={() => setShowTableModal(true)}
-                        className="group flex flex-col items-end hover:scale-105 transition-all active:scale-95"
-                    >
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-300 mb-1 group-hover:text-blue-600 transition-colors">Votre Table</span>
-                        <div className="bg-[#0A0A0B] px-5 py-2 rounded-2xl shadow-xl flex items-center gap-2 border border-white/10">
-                            <span className="text-white text-lg font-black italic">{tableNumber || 'Sélectionner'}</span>
-                            <MapPin size={14} className="text-blue-500" />
+            {/* Header (Banner / Hero) */}
+            <div className="relative">
+                {/* Banner Image */}
+                <div className="h-[250px] md:h-[350px] w-full overflow-hidden relative">
+                    {restaurant.banner_url ? (
+                        <div className="w-full h-full relative">
+                            <img src={restaurant.banner_url} className="w-full h-full object-cover" alt="Banner" />
+                            <div className="absolute inset-0 bg-black/40" /> {/* Always darken banner for text readability */}
                         </div>
-                    </button>
+                    ) : (
+                        <div className="w-full h-full relative" style={{ backgroundColor: primaryColor }}>
+                            <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, black 1px, transparent 0)', backgroundSize: '32px 32px' }}></div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                        </div>
+                    )}
                 </div>
 
-                <div className="relative">
-                    <div className="flex items-center gap-6">
+                {/* Restaurant Info Overlay */}
+                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div className="flex items-center gap-5">
                         {restaurant.logo_url && (
-                            <img src={restaurant.logo_url} className="w-24 h-24 object-cover rounded-[2rem] shadow-2xl border-4 border-white" alt="" />
+                            <div className="w-20 h-20 md:w-24 md:h-24 bg-white p-1 rounded-2xl shadow-xl flex-shrink-0">
+                                <img src={restaurant.logo_url} className="w-full h-full object-cover rounded-xl" alt="Logo" />
+                            </div>
                         )}
-                        <div>
-                            <h1 className="text-5xl font-black tracking-tighter italic uppercase leading-none mb-3">
-                                {restaurant.name}
-                            </h1>
-                            <div className="flex flex-wrap items-center gap-4 text-xs font-black uppercase tracking-widest text-gray-400">
-                                <div className="flex items-center gap-1.5 text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full">
-                                    <ShoppingBag size={12} strokeWidth={3} />
-                                    <span>Ouvert</span>
-                                </div>
+                        <div className="text-white drop-shadow-md pb-1">
+                            <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-1">{restaurant.name}</h1>
+                            <div className="flex items-center gap-2 text-sm md:text-base font-medium opacity-90">
+                                <span className="bg-emerald-500/90 px-2 py-0.5 rounded textxs font-bold uppercase tracking-wider backdrop-blur-md">Ouvert</span>
+                                <span>• Cuisine de passion</span>
                             </div>
                         </div>
                     </div>
-                </div>
-            </header>
 
-            {/* Premium Search Bar */}
-            <div className="px-6 mb-10">
-                <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
-                        <Search className="text-gray-300 group-focus-within:text-blue-600 transition-colors" size={18} strokeWidth={3} />
-                    </div>
-                    <input
-                        type="text"
-                        placeholder="Qu'est-ce qui vous fait plaisir ?"
-                        className="w-full bg-[#F5F5F7] border-none rounded-[2rem] py-6 pl-16 pr-8 text-sm font-bold focus:ring-4 focus:ring-blue-100 transition-all placeholder:text-gray-300 shadow-sm"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                </div>
-            </div>
-
-            {/* Categorized Visual Tabs */}
-            <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-3xl border-b border-gray-100/50 -mx-6 px-12 py-6 overflow-x-auto scrollbar-hide flex gap-8 items-center">
-                {categories.map((cat) => (
                     <button
-                        key={cat.id}
-                        onClick={() => {
-                            setActiveCategory(cat.id);
-                            const el = document.getElementById(cat.id);
-                            const offset = 120; // Adjust for sticky header
-                            const bodyRect = document.body.getBoundingClientRect().top;
-                            const elementRect = el?.getBoundingClientRect().top || 0;
-                            const elementPosition = elementRect - bodyRect;
-                            const offsetPosition = elementPosition - offset;
-
-                            window.scrollTo({
-                                top: offsetPosition,
-                                behavior: "smooth"
-                            });
-                        }}
-                        className={`group relative flex flex-col items-center gap-2 flex-shrink-0 transition-all ${activeCategory === cat.id ? 'opacity-100' : 'opacity-40 hover:opacity-60'
-                            }`}
+                        onClick={() => setShowTableModal(true)}
+                        className="bg-white/10 backdrop-blur-lg border border-white/20 text-white px-4 py-2 rounded-lg flex items-center gap-3 hover:bg-white/20 transition-colors"
                     >
-                        <span className="text-[11px] font-black uppercase tracking-[0.2em] whitespace-nowrap">
-                            {cat.name}
-                        </span>
-                        <div className={`h-1.5 rounded-full bg-blue-600 transition-all duration-500 ${activeCategory === cat.id ? 'w-full' : 'w-0 group-hover:w-4'
-                            }`}></div>
+                        <div className="flex flex-col items-start">
+                            <span className="text-[10px] uppercase opacity-70 tracking-wider font-bold">Votre Table</span>
+                            <span className="text-xl font-bold leading-none">{tableNumber || '?'}</span>
+                        </div>
+                        <MapPin size={20} />
                     </button>
-                ))}
+                </div>
             </div>
 
-            {/* Menu List */}
-            <div className="px-6 mt-12 space-y-20">
-                {categories.map((category) => {
+            {/* Sticky Navigation & Search */}
+            <div className={`sticky top-0 z-40 border-b backdrop-blur-md transition-colors duration-300 ${isBgLight ? 'bg-white/80 border-slate-100' : 'bg-slate-900/80 border-slate-800'}`}>
+                <div className="px-6 py-4 space-y-4">
+                    {/* Search Input */}
+                    <div className="relative">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 opacity-50" size={18} color={fontColor} />
+                        <input
+                            type="text"
+                            placeholder="Rechercher un plat..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className={`w-full pl-11 pr-4 py-3 rounded-xl font-medium focus:ring-2 focus:ring-offset-2 transition-all outline-none ${inputBg}`}
+                            style={{ ['--tw-ring-color' as any]: primaryColor, color: fontColor }}
+                        />
+                    </div>
+
+                    {/* Categories Scroll */}
+                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-6 px-6">
+                        <button
+                            onClick={() => { setActiveCategory(null); window.scrollTo({ top: 350, behavior: 'smooth' }); }}
+                            className={`whitespace-nowrap px-4 py-2 rounded-lg font-bold text-sm transition-all border ${!activeCategory ? `opacity-100 border-current` : `bg-transparent opacity-60 hover:opacity-100`}`}
+                            style={!activeCategory ? { backgroundColor: primaryColor, borderColor: primaryColor, color: isLightColor(primaryColor) ? '#000' : '#FFF' } : { borderColor: 'currentColor' }}
+                        >
+                            TOUT
+                        </button>
+                        {categories.map(cat => (
+                            <button
+                                key={cat.id}
+                                onClick={() => {
+                                    setActiveCategory(cat.id);
+                                    const el = document.getElementById(cat.id);
+                                    if (el) {
+                                        const y = el.getBoundingClientRect().top + window.scrollY - 180;
+                                        window.scrollTo({ top: y, behavior: 'smooth' });
+                                    }
+                                }}
+                                className={`whitespace-nowrap px-4 py-2 rounded-lg font-bold text-sm transition-all border ${activeCategory === cat.id ? `opacity-100` : `bg-transparent opacity-60 hover:opacity-100`}`}
+                                style={activeCategory === cat.id ? { backgroundColor: primaryColor, borderColor: primaryColor, color: isLightColor(primaryColor) ? '#000' : '#FFF' } : { borderColor: 'currentColor' }}
+                            >
+                                {cat.name}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Menu Grid */}
+            <div className="px-4 py-8 md:px-6 max-w-3xl mx-auto pb-32 space-y-12">
+                {categories.map(category => {
                     const categoryItems = filteredItems.filter(i => i.category_id === category.id);
                     if (categoryItems.length === 0) return null;
 
                     return (
-                        <section key={category.id} id={category.id} className="scroll-mt-32">
-                            <div className="flex items-baseline justify-between mb-8">
-                                <h2 className="text-3xl font-black italic tracking-tighter uppercase underline decoration-4 decoration-blue-600 underline-offset-8">
-                                    {category.name}
-                                </h2>
-                                <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">{categoryItems.length} CHOIX</span>
-                            </div>
-
-                            <div className="grid grid-cols-1 gap-8">
-                                {categoryItems.map((item) => (
+                        <div key={category.id} id={category.id} className="scroll-mt-48">
+                            <h3 className="text-2xl font-bold mb-6">{category.name}</h3>
+                            <div className="space-y-4">
+                                {categoryItems.map(item => (
                                     <div
                                         key={item.id}
-                                        className="relative group bg-white p-6 rounded-[3rem] border border-gray-100 shadow-xl shadow-black/[0.02] flex gap-6 hover:shadow-2xl hover:shadow-blue-500/5 transition-all active:scale-[0.98]"
+                                        className={`group relative flex gap-4 p-4 rounded-2xl transition-all border hover:border-transparent hover:shadow-lg ${cardBg} ${cardBorder}`}
                                     >
-                                        <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden rounded-[2rem]">
+                                        <div className="w-24 h-24 md:w-32 md:h-32 flex-shrink-0 bg-slate-100 rounded-xl overflow-hidden relative">
                                             {item.image_url ? (
-                                                <img
-                                                    src={item.image_url}
-                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                                    alt={item.name}
-                                                />
+                                                <img src={item.image_url} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                                             ) : (
-                                                <div className="w-full h-full bg-gray-50 flex items-center justify-center">
-                                                    <ShoppingBag className="text-gray-200" size={32} />
+                                                <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                    <Clock size={24} />
                                                 </div>
                                             )}
                                         </div>
 
-                                        <div className="flex-1 flex flex-col justify-center py-2">
-                                            <div className="mb-4">
-                                                <h3 className="text-xl font-black text-[#0A0A0B] leading-none mb-2 tracking-tight">
-                                                    {item.name}
-                                                </h3>
-                                                <p className="text-xs font-bold text-gray-400 leading-relaxed line-clamp-2 pr-4 italic">
-                                                    {item.description || "Une création signature faite avec passion."}
-                                                </p>
+                                        <div className="flex-1 flex flex-col justify-between py-1">
+                                            <div>
+                                                <div className="flex justify-between items-start gap-2">
+                                                    <h4 className="text-lg font-bold leading-tight">{item.name}</h4>
+                                                    <span className="font-bold">{item.price}€</span>
+                                                </div>
+                                                <p className="text-sm mt-1 line-clamp-2 leading-relaxed opacity-70">{item.description}</p>
                                             </div>
 
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-2xl font-black tracking-tighter">{item.price.toFixed(2)}€</span>
+                                            <div className="flex justify-end pt-2">
                                                 <button
-                                                    onClick={() => handleAddToCart({ id: item.id, name: item.name, price: item.price, image_url: item.image_url || undefined })}
-                                                    disabled={!isLoaded}
-                                                    className="bg-[#0A0A0B] text-white p-4 rounded-[1.5rem] hover:bg-blue-600 transition-all shadow-xl active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    onClick={() => addToCart({ id: item.id, name: item.name, price: item.price, image_url: item.image_url || undefined, quantity: 1 })}
+                                                    className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-white shadow-md active:scale-90 transition-all font-bold"
+                                                    style={{ backgroundColor: primaryColor, color: isLightColor(primaryColor) ? '#000' : '#FFF' }}
                                                 >
-                                                    <Plus size={24} strokeWidth={3} />
+                                                    <Plus size={18} />
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
                                 ))}
                             </div>
-                        </section>
+                        </div>
                     );
                 })}
             </div>
 
-            {/* Table Selector Modal */}
-            {showTableModal && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-xl z-[60] flex items-center justify-center p-6 animate-in fade-in duration-300">
-                    <div className="bg-white w-full max-w-md rounded-[3.5rem] p-10 shadow-2xl animate-in zoom-in-95 duration-300">
-                        <div className="flex items-center justify-between mb-8">
-                            <div>
-                                <h3 className="text-3xl font-black text-[#0A0A0B] tracking-tighter italic uppercase leading-none mb-2">Choisir Table</h3>
-                                <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Où vous trouvez-vous ?</p>
-                            </div>
-                            <button onClick={() => setShowTableModal(false)} className="p-4 bg-gray-50 rounded-2xl hover:bg-red-50 hover:text-red-500 transition-colors">
-                                <Plus size={24} className="rotate-45" />
-                            </button>
-                        </div>
-
-                        <div className="grid grid-cols-3 gap-4 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
-                            {tables.map((table) => (
-                                <button
-                                    key={table.id}
-                                    onClick={() => {
-                                        setSearchParams({ t: table.table_number });
-                                        setShowTableModal(false);
-                                    }}
-                                    className={`
-                                        aspect-square flex items-center justify-center rounded-[2rem] text-xl font-black italic transition-all active:scale-90
-                                        ${tableNumber === table.table_number
-                                            ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/40'
-                                            : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}
-                                    `}
-                                >
-                                    {table.table_number}
-                                </button>
-                            ))}
-                        </div>
-
-                        <div className="mt-8 p-6 bg-blue-50 rounded-3xl">
-                            <p className="text-center text-[11px] font-bold text-blue-600 leading-relaxed uppercase tracking-wider">
-                                Sélectionnez votre numéro de table <br /> pour que nous puissions vous servir.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Floating Cart & Cart Modal */}
+            {/* Floating Cart Button */}
             {totalItems > 0 && (
-                <div className="fixed bottom-10 left-6 right-6 z-40 animate-in slide-in-from-bottom flex justify-center">
+                <div className="fixed bottom-6 inset-x-0 flex justify-center z-50 px-4">
                     <button
                         onClick={() => setShowCartModal(true)}
-                        className="w-full max-w-lg bg-[#0A0A0B] text-white p-5 rounded-[2.5rem] flex items-center justify-between shadow-2xl group border border-white/10"
+                        className="w-full max-w-md shadow-2xl rounded-2xl py-4 px-6 flex items-center justify-between text-white font-bold transform transition-all active:scale-95 hover:shadow-xl"
+                        style={{ backgroundColor: primaryColor, color: isLightColor(primaryColor) ? '#000' : '#FFF' }}
                     >
-                        <div className="flex items-center gap-4 px-2">
-                            <div className="w-12 h-12 bg-white/10 backdrop-blur-xl rounded-2xl flex items-center justify-center font-black italic text-xl">
-                                {totalItems}
-                            </div>
-                            <span className="text-sm font-black italic underline decoration-blue-500 decoration-2 underline-offset-4">VOIR PANIER</span>
+                        <div className="flex items-center gap-3">
+                            <div className="bg-white/20 px-3 py-1 rounded-lg text-sm">{totalItems}</div>
+                            <span>Voir le panier</span>
                         </div>
-                        <div className="bg-white/10 backdrop-blur-xl px-6 py-3 rounded-2xl">
-                            <span className="text-lg font-black tracking-tighter italic">{totalPrice.toFixed(2)}€</span>
-                        </div>
+                        <span className="text-lg">{totalPrice.toFixed(2)}€</span>
                     </button>
                 </div>
             )}
 
-            {showCartModal && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex flex-col justify-end transition-all duration-500">
-                    <div className="absolute inset-0" onClick={() => setShowCartModal(false)}></div>
-                    <div className="relative bg-[#FDFDFD] rounded-t-[4rem] w-full max-w-2xl mx-auto p-10 pt-4 animate-in slide-in-from-bottom duration-500">
-                        <div className="w-16 h-1.5 bg-gray-100 rounded-full mx-auto mb-12"></div>
-                        <h3 className="text-4xl font-black text-[#0A0A0B] tracking-tighter italic uppercase mb-8">Votre Panier</h3>
-                        <div className="space-y-8 max-h-[40vh] overflow-y-auto pr-4 mb-12 custom-scrollbar">
-                            {cart.map((item: CartItem) => (
-                                <div key={item.id} className="flex items-center gap-6">
-                                    <div className="w-20 h-20 rounded-[1.5rem] bg-gray-50 flex-shrink-0 overflow-hidden shadow-lg shadow-black/5">
-                                        {item.image_url ? <img src={item.image_url} className="w-full h-full object-cover" alt="" /> : <div className="w-full h-full" />}
-                                    </div>
-                                    <div className="flex-1">
-                                        <h4 className="text-lg font-black text-[#0A0A0B] tracking-tight mb-1">{item.name}</h4>
-                                        <p className="text-blue-600 font-black italic text-sm">{item.price.toFixed(2)}€</p>
-                                    </div>
-                                    <div className="flex items-center gap-4 bg-[#F5F5F7] p-2 rounded-[1.5rem]">
-                                        <button onClick={() => removeFromCart(item.id)} className="w-10 h-10 flex items-center justify-center bg-white rounded-xl shadow-sm text-gray-400"><Minus size={16} strokeWidth={4} /></button>
-                                        <span className="font-black text-lg min-w-[1.5rem] text-center italic">{item.quantity}</span>
-                                        <button onClick={() => addToCart(item)} className="w-10 h-10 flex items-center justify-center bg-[#0A0A0B] text-white rounded-xl shadow-sm"><Plus size={16} strokeWidth={4} /></button>
-                                    </div>
-                                </div>
+            {/* Table Selection Modal */}
+            {showTableModal && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    <div className={`w-full max-w-sm rounded-3xl p-8 shadow-2xl ${isBgLight ? 'bg-white' : 'bg-slate-900 border border-slate-800'}`}>
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className={`text-xl font-bold`}>Numéro de table</h3>
+                            <button onClick={() => setShowTableModal(false)} className={`p-2 rounded-full hover:bg-slate-100 ${isBgLight ? 'hover:bg-slate-100' : 'hover:bg-slate-800'}`}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-4 gap-3">
+                            {tables.map(t => (
+                                <button
+                                    key={t.id}
+                                    onClick={() => {
+                                        setSearchParams({ t: t.table_number });
+                                        setShowTableModal(false);
+                                    }}
+                                    className={`aspect-square rounded-xl font-bold text-lg transition-all ${tableNumber === t.table_number
+                                            ? `text-white shadow-lg scale-105`
+                                            : `${isBgLight ? 'bg-slate-100 hover:bg-slate-200' : 'bg-slate-800 hover:bg-slate-700'}`
+                                        }`}
+                                    style={tableNumber === t.table_number ? { backgroundColor: primaryColor, color: isLightColor(primaryColor) ? '#000' : '#FFF' } : { color: fontColor }}
+                                >
+                                    {t.table_number}
+                                </button>
                             ))}
                         </div>
-                        <div className="pt-10 border-t-4 border-dashed border-gray-50 space-y-10">
-                            <div className="flex items-end justify-between">
-                                <span className="text-xs font-black text-gray-400 uppercase tracking-[0.3em]">Total Final</span>
-                                <span className="text-5xl font-black tracking-tighter italic text-[#0A0A0B]">{totalPrice.toFixed(2)}€</span>
+                    </div>
+                </div>
+            )}
+
+            {/* Cart Modal */}
+            {showCartModal && (
+                <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex justify-end animate-in fade-in duration-200">
+                    <div className="absolute inset-0" onClick={() => setShowCartModal(false)} />
+                    <div className={`relative w-full max-w-md h-full shadow-2xl flex flex-col pt-10 ${isBgLight ? 'bg-white' : 'bg-slate-900'}`} style={{ animation: 'slideInRight 0.3s ease-out', color: fontColor }}>
+
+                        <div className="px-6 pb-6 border-b border-gray-100 flex items-center justify-between">
+                            <h2 className={`text-2xl font-bold`}>Votre Commande</h2>
+                            <button onClick={() => setShowCartModal(false)} className={`p-2 rounded-full ${isBgLight ? 'bg-slate-100' : 'bg-slate-800'}`}>
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                            {cart.length === 0 ? (
+                                <div className="h-full flex flex-col items-center justify-center text-center opacity-50">
+                                    <ShoppingBag size={48} className="mb-4" />
+                                    <p className="font-medium">Votre panier est vide</p>
+                                </div>
+                            ) : (
+                                cart.map(item => (
+                                    <div key={item.id} className="flex gap-4">
+                                        <div className="w-16 h-16 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0">
+                                            {item.image_url && <img src={item.image_url} className="w-full h-full object-cover" />}
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="flex justify-between items-start mb-1">
+                                                <h4 className="font-bold text-sm">{item.name}</h4>
+                                                <span className="font-bold">{(item.price * item.quantity).toFixed(2)}€</span>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <button onClick={() => removeFromCart(item.id)} className="w-6 h-6 rounded-md bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200"><Minus size={14} /></button>
+                                                <span className="text-sm font-bold w-4 text-center">{item.quantity}</span>
+                                                <button onClick={() => addToCart(item)} className="w-6 h-6 rounded-md bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200"><Plus size={14} /></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+
+                        <div className={`p-6 border-t ${isBgLight ? 'bg-slate-50 border-slate-100' : 'bg-slate-800/50 border-slate-800'}`}>
+                            <div className="flex justify-between items-center mb-6">
+                                <span className="text-lg font-bold opacity-70">Total à payer</span>
+                                <span className="text-3xl font-bold">{totalPrice.toFixed(2)}€</span>
                             </div>
                             <button
                                 onClick={handleCheckout}
-                                disabled={isSubmitting}
-                                className="w-full bg-[#0A0A0B] text-white py-8 rounded-[2.5rem] flex items-center justify-center gap-4 shadow-2xl transition-all disabled:opacity-50"
+                                disabled={isSubmitting || cart.length === 0}
+                                className="w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                style={{ backgroundColor: primaryColor, color: isLightColor(primaryColor) ? '#000' : '#FFF' }}
                             >
-                                <span className="text-sm font-black uppercase tracking-[0.3em]">{isSubmitting ? 'TRANSMISSION...' : `COMMANDER TABLE ${tableNumber || '??'}`}</span>
+                                {isSubmitting ? 'Envoi...' : 'Commander'}
                             </button>
                         </div>
                     </div>
                 </div>
             )}
+
+            <style>{`
+                .scrollbar-hide::-webkit-scrollbar { display: none; }
+                .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+                @keyframes slideInRight {
+                    from { transform: translateX(100%); }
+                    to { transform: translateX(0); }
+                }
+            `}</style>
         </div>
     );
 };
