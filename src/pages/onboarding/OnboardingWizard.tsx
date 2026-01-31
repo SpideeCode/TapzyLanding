@@ -173,7 +173,7 @@ export const OnboardingWizard: React.FC = () => {
             <a href="/" className="absolute top-6 left-6 text-slate-400 hover:text-slate-900 transition-colors flex items-center gap-2 text-sm font-bold uppercase tracking-widest">
                 ← Accueil
             </a>
-            <div className="max-w-xl w-full bg-white rounded-[2.5rem] shadow-xl p-8 md:p-12 relative overflow-hidden">
+            <div className="max-w-xl w-full bg-white rounded-[2.5rem] shadow-xl p-6 md:p-12 relative overflow-hidden">
                 {/* Progress Bar */}
                 <div className="absolute top-0 left-0 w-full h-2 bg-slate-100">
                     <div

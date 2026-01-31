@@ -109,7 +109,7 @@ export const LiveOrders: React.FC = () => {
         <div className="h-full flex flex-col">
             <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                 <div>
-                    <h1 className="text-5xl font-black text-slate-900 tracking-tighter italic uppercase leading-none mb-4">
+                    <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter italic uppercase leading-none mb-4">
                         COMMANDES <span className="text-blue-600">LIVE</span>
                     </h1>
                     <div className="flex items-center gap-3">
@@ -146,10 +146,10 @@ export const LiveOrders: React.FC = () => {
                             {getOrdersByStatus(col.id).map((order) => (
                                 <div
                                     key={order.id}
-                                    className="bg-white rounded-[3rem] border-2 border-slate-200 shadow-sm group hover:border-blue-600 transition-all duration-300 relative overflow-hidden active:scale-[0.99]"
+                                    className="bg-white rounded-[2rem] md:rounded-[3rem] border-2 border-slate-200 shadow-sm group hover:border-blue-600 transition-all duration-300 relative overflow-hidden active:scale-[0.99]"
                                 >
                                     {/* Card Header */}
-                                    <div className="p-8 border-b-2 border-slate-50 flex items-center justify-between bg-slate-50/50">
+                                    <div className="p-6 md:p-8 border-b-2 border-slate-50 flex items-center justify-between bg-slate-50/50">
                                         <div className="flex items-center gap-5">
                                             <div className="bg-white text-slate-900 w-16 h-16 rounded-[1.5rem] flex flex-col items-center justify-center border-2 border-slate-200 shadow-sm group-hover:bg-slate-900 group-hover:text-white group-hover:border-slate-900 transition-all duration-300">
                                                 <span className="text-[8px] font-black uppercase tracking-widest opacity-40 leading-none mb-1">Table</span>
@@ -171,7 +171,7 @@ export const LiveOrders: React.FC = () => {
                                     </div>
 
                                     {/* Items */}
-                                    <div className="p-8 space-y-5">
+                                    <div className="p-6 md:p-8 space-y-5">
                                         {order.order_items.map((item) => (
                                             <div key={item.id} className="flex items-center justify-between group/item">
                                                 <div className="flex items-center gap-5">
@@ -189,7 +189,7 @@ export const LiveOrders: React.FC = () => {
                                         <button
                                             onClick={() => handleNextStatus(order)}
                                             className={`
-                                                w-full py-5 rounded-[2rem] font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-center gap-3 transition-all active:scale-95 shadow-lg
+                                                w-full py-4 md:py-5 rounded-[2rem] font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-center gap-3 transition-all active:scale-95 shadow-lg
                                                 ${order.status === 'pending' ? 'bg-slate-900 text-white hover:bg-black shadow-slate-900/10' :
                                                     order.status === 'preparing' ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-600/20' :
                                                         'bg-gray-50 text-gray-400 border border-slate-100 shadow-none'}

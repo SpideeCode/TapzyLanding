@@ -178,7 +178,7 @@ export default function Home() {
             {/* CTA */}
             <section className="container mx-auto px-6 py-20">
                 <FadeIn>
-                    <div className="bg-[#161617] rounded-3xl p-12 lg:p-20 text-center border-2 border-[#2A2A2B]">
+                    <div className="bg-[#161617] rounded-3xl p-6 md:p-12 lg:p-20 text-center border-2 border-[#2A2A2B]">
                         <h2 className="text-4xl font-bold mb-6 text-[#EAEAEA]">Prêt à digitaliser votre restaurant ?</h2>
                         <p className="text-xl text-[#A0A0A0] mb-10 max-w-2xl mx-auto">
                             Rejoignez les restaurants qui font confiance à Tapzy pour améliorer leur service.

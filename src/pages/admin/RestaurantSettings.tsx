@@ -127,7 +127,7 @@ export const RestaurantSettings: React.FC = () => {
         <div className="max-w-4xl space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
             {/* Header */}
             <div>
-                <h1 className="text-4xl font-black text-slate-900 tracking-tighter leading-tight italic">
+                <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tighter leading-tight italic">
                     PARAMÈTRES DU <span className="text-blue-600 not-italic uppercase">Restaurant</span>
                 </h1>
                 <p className="text-gray-400 font-bold mt-2 uppercase tracking-widest text-[10px] flex items-center gap-2">
@@ -145,7 +145,7 @@ export const RestaurantSettings: React.FC = () => {
 
             <form onSubmit={handleSave} className="grid grid-cols-1 gap-12">
                 {/* Visual Identity Section */}
-                <div className="bg-white rounded-[3rem] border-2 border-slate-200 p-10 space-y-10 shadow-sm relative overflow-hidden active:focus-within:border-blue-600 transition-colors duration-500">
+                <div className="bg-white rounded-[2rem] md:rounded-[3rem] border-2 border-slate-200 p-6 md:p-10 space-y-10 shadow-sm relative overflow-hidden active:focus-within:border-blue-600 transition-colors duration-500">
                     <div className="absolute -right-10 -top-10 w-40 h-40 bg-blue-50 rounded-full blur-3xl pointer-events-none opacity-50" />
 
                     <div className="flex items-center gap-4 border-b-2 border-slate-100 pb-8">
@@ -178,7 +178,7 @@ export const RestaurantSettings: React.FC = () => {
                 </div>
 
                 {/* General Info Section */}
-                <div className="bg-white rounded-[3rem] border-2 border-slate-200 p-10 space-y-10 shadow-sm relative overflow-hidden">
+                <div className="bg-white rounded-[2rem] md:rounded-[3rem] border-2 border-slate-200 p-6 md:p-10 space-y-10 shadow-sm relative overflow-hidden">
                     <div className="flex items-center gap-4 border-b-2 border-slate-100 pb-8">
                         <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-blue-600 border-2 border-white shadow-sm">
                             <Store size={24} strokeWidth={2.5} />
@@ -217,7 +217,7 @@ export const RestaurantSettings: React.FC = () => {
                 </div>
 
                 {/* Branding Customization Section */}
-                <div className="bg-white rounded-[3rem] border-2 border-slate-200 p-10 space-y-10 shadow-sm relative overflow-hidden">
+                <div className="bg-white rounded-[2rem] md:rounded-[3rem] border-2 border-slate-200 p-6 md:p-10 space-y-10 shadow-sm relative overflow-hidden">
                     <div className="flex items-center gap-4 border-b-2 border-slate-100 pb-8">
                         <div className="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 border-2 border-white shadow-sm">
                             <Store size={24} strokeWidth={2.5} />
@@ -281,7 +281,7 @@ export const RestaurantSettings: React.FC = () => {
                 </div>
 
                 {/* Staff Access Section */}
-                <div className="bg-white rounded-[3rem] border-2 border-slate-200 p-10 space-y-10 shadow-sm relative overflow-hidden">
+                <div className="bg-white rounded-[2rem] md:rounded-[3rem] border-2 border-slate-200 p-6 md:p-10 space-y-10 shadow-sm relative overflow-hidden">
                     <div className="flex items-center gap-4 border-b-2 border-slate-100 pb-8">
                         <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-blue-600 border-2 border-white shadow-sm">
                             <Lock size={24} strokeWidth={2.5} />
@@ -338,7 +338,7 @@ export const RestaurantSettings: React.FC = () => {
                 </div>
 
                 {/* Digital Menu Link Preview */}
-                <div className="bg-blue-600 p-10 rounded-[3rem] flex items-center gap-10 group shadow-2xl shadow-blue-500/20 relative overflow-hidden">
+                <div className="bg-blue-600 p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] flex items-center gap-10 group shadow-2xl shadow-blue-500/20 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 -mr-20 -mt-20 rounded-full group-hover:scale-110 transition-transform duration-700" />
 
                     <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center text-blue-600 shadow-xl relative z-10">

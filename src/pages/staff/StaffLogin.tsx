@@ -43,8 +43,11 @@ export const StaffLogin = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
-            <div className="w-full max-w-md bg-white rounded-[3rem] shadow-xl shadow-slate-200/50 p-10 border-2 border-slate-100 relative overflow-hidden">
+        <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 relative">
+            <a href="/" className="absolute top-6 left-6 text-slate-400 hover:text-slate-900 transition-colors flex items-center gap-2 text-sm font-bold uppercase tracking-widest">
+                ← Accueil
+            </a>
+            <div className="w-full max-w-md bg-white rounded-[2rem] md:rounded-[3rem] shadow-xl shadow-slate-200/50 p-6 md:p-10 border-2 border-slate-100 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-2 bg-blue-600" />
 
                 <div className="flex flex-col items-center mb-10 text-center">

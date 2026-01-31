@@ -75,7 +75,7 @@ export const GlobalStaffLogin = () => {
                 ← Accueil
             </a>
 
-            <div className="w-full max-w-md bg-white rounded-[3rem] shadow-xl shadow-slate-200/50 p-10 border-2 border-slate-100 relative overflow-hidden">
+            <div className="w-full max-w-md bg-white rounded-[2rem] md:rounded-[3rem] shadow-xl shadow-slate-200/50 p-6 md:p-10 border-2 border-slate-100 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-2 bg-slate-900" />
 
                 <div className="flex flex-col items-center mb-10 text-center">

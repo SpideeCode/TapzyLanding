@@ -46,7 +46,7 @@ export default function Contact() {
                         </p>
                     </div>
 
-                    <div className="bg-[#161617] rounded-3xl p-8 md:p-12 border border-[#2A2A2B]">
+                    <div className="bg-[#161617] rounded-3xl p-6 md:p-12 border border-[#2A2A2B]">
                         {status === 'success' ? (
                             <div className="text-center py-12">
                                 <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
