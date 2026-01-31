@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Routes, Route, Navigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { MenuManagement } from '../admin/MenuManagement';
 import { TableManagement } from '../admin/Tables';
 import { RestaurantSettings } from '../admin/RestaurantSettings';
 import {
-    UtensilsCrossed,
-    QrCode,
-    Settings,
     Users,
     ArrowLeft,
     Store
@@ -17,7 +14,6 @@ export const RestaurantManager: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [restaurant, setRestaurant] = useState<{ name: string } | null>(null);
-    const [activeTab, setActiveTab] = useState<'menu' | 'tables' | 'settings' | 'staff'>('menu');
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -50,13 +46,6 @@ export const RestaurantManager: React.FC = () => {
             </div>
         );
     }
-
-    const tabs = [
-        { id: 'menu', label: 'Menu Digital', icon: UtensilsCrossed },
-        { id: 'tables', label: 'Tables & QR', icon: QrCode },
-        { id: 'staff', label: 'Équipe', icon: Users },
-        { id: 'settings', label: 'Paramètres', icon: Settings },
-    ];
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
@@ -92,48 +81,28 @@ export const RestaurantManager: React.FC = () => {
                             </div>
                         </div>
                     </div>
-
-                    {/* Tabs */}
-                    <div className="flex overflow-x-auto gap-2 mt-8 -mb-2 pb-2 scrollbar-hide">
-                        {tabs.map(tab => {
-                            const Icon = tab.icon;
-                            const isActive = activeTab === tab.id;
-                            return (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id as any)}
-                                    className={`flex items-center gap-3 px-6 py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition-all whitespace-nowrap ${isActive
-                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                                        : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
-                                        }`}
-                                >
-                                    <Icon size={16} />
-                                    {tab.label}
-                                </button>
-                            );
-                        })}
-                    </div>
                 </div>
             </div>
 
-            {/* Content Area */}
+            {/* Content Area - Driven by Routes */}
             <div className="min-h-[500px]">
-                {activeTab === 'menu' && <MenuManagement restaurantId={id} />}
-                {activeTab === 'tables' && <TableManagement restaurantId={id} />}
-                {activeTab === 'settings' && <RestaurantSettings restaurantId={id} />}
-                {activeTab === 'staff' && (
-                    <div className="p-12 text-center bg-[#111113] rounded-[2rem] border border-white/5">
-                        <div className="w-16 h-16 bg-gray-800/50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-gray-500">
-                            <Users size={32} />
+                <Routes>
+                    <Route index element={<Navigate to="menu" replace />} />
+                    <Route path="menu" element={<MenuManagement restaurantId={id} />} />
+                    <Route path="tables" element={<TableManagement restaurantId={id} />} />
+                    <Route path="settings" element={<RestaurantSettings restaurantId={id} />} />
+                    <Route path="staff" element={
+                        <div className="p-12 text-center bg-[#111113] rounded-[2rem] border border-white/5">
+                            <div className="w-16 h-16 bg-gray-800/50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-gray-500">
+                                <Users size={32} />
+                            </div>
+                            <h3 className="text-xl font-bold text-white mb-2">Gestion d'équipe</h3>
+                            <p className="text-gray-500 text-sm">
+                                Module en cours de développement. Utilisez les paramètres pour gérer l'accès.
+                            </p>
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-2">Gestion d'équipe</h3>
-                        <p className="text-gray-500 text-sm">
-                            Le module de gestion d'équipe pour SuperAdmin est en cours de développement.
-                            <br />
-                            Vous pouvez utiliser les paramètres ("Accès Staff") pour réinitialiser le code PIN.
-                        </p>
-                    </div>
-                )}
+                    } />
+                </Routes>
             </div>
         </div>
     );

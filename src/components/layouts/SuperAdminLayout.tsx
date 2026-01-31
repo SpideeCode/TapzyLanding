@@ -5,7 +5,10 @@ import {
     Store,
     Menu as MenuIcon,
     X,
-    LogOut
+    LogOut,
+    ArrowLeft,
+    Users,
+    Settings
 } from 'lucide-react';
 
 import { supabase } from '../../lib/supabase';
@@ -14,14 +17,27 @@ interface SuperAdminLayoutProps {
     children: React.ReactNode;
 }
 
-const navigation = [
-    { name: 'Tableau de bord', href: '/superadmin', icon: LayoutDashboard },
-    { name: 'Restaurants', href: '/superadmin/restaurants', icon: Store },
-];
-
 export const SuperAdminLayout: React.FC<SuperAdminLayoutProps> = ({ children }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const location = useLocation();
+
+    // Determine current navigation based on URL
+    const isRestaurantContext = location.pathname.includes('/superadmin/restaurant/');
+    // Extract ID from pathname: /superadmin/restaurant/UUID/something
+    const parts = location.pathname.split('/');
+    const restaurantIndex = parts.indexOf('restaurant');
+    const currentRestaurantId = (restaurantIndex !== -1 && parts.length > restaurantIndex + 1) ? parts[restaurantIndex + 1] : null;
+
+    const navigation = (isRestaurantContext && currentRestaurantId) ? [
+        { name: 'Retour', href: '/superadmin/restaurants', icon: ArrowLeft },
+        { name: 'Menu', href: `/superadmin/restaurant/${currentRestaurantId}/menu`, icon: MenuIcon },
+        { name: 'Tables', href: `/superadmin/restaurant/${currentRestaurantId}/tables`, icon: LayoutDashboard },
+        { name: 'Staff', href: `/superadmin/restaurant/${currentRestaurantId}/staff`, icon: Users },
+        { name: 'Paramètres', href: `/superadmin/restaurant/${currentRestaurantId}/settings`, icon: Settings },
+    ] : [
+        { name: 'Tableau de bord', href: '/superadmin', icon: LayoutDashboard },
+        { name: 'Restaurants', href: '/superadmin/restaurants', icon: Store },
+    ];
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
@@ -55,8 +71,9 @@ export const SuperAdminLayout: React.FC<SuperAdminLayoutProps> = ({ children }) 
 
                     {/* Navigation */}
                     <nav className="flex-1 px-4 space-y-1.5 focus:outline-none">
-                        {navigation.map((item) => {
-                            const isActive = location.pathname === item.href;
+                        {navigation && navigation.map((item) => {
+                            const isActive = location.pathname === item.href || location.pathname.startsWith(item.href + '/'); // Loose match for sub-routes
+                            // Except for "Retour", logic might need adjustment but link is specific
                             return (
                                 <Link
                                     key={item.name}
