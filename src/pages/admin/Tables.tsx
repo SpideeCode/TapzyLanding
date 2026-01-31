@@ -202,9 +202,9 @@ export const TableManagement: React.FC = () => {
 
             {/* Modal */}
             {showModal && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-6">
-                    <div className="bg-white w-full max-w-md rounded-[3rem] border border-gray-100 shadow-3xl overflow-hidden animate-in zoom-in duration-300">
-                        <div className="p-10 border-b border-gray-50 flex items-center justify-between">
+                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4 md:p-6">
+                    <div className="bg-white w-full max-w-md rounded-[2rem] md:rounded-[3rem] border border-gray-100 shadow-3xl overflow-hidden animate-in zoom-in duration-300 max-h-[90vh] flex flex-col">
+                        <div className="p-6 md:p-10 border-b border-gray-50 flex items-center justify-between shrink-0">
                             <h3 className="text-2xl font-black text-slate-900 italic tracking-tighter uppercase leading-none">
                                 {editingTable ? 'MODIFIER LA TABLE' : 'NOUVELLE TABLE'}
                             </h3>
@@ -212,7 +212,7 @@ export const TableManagement: React.FC = () => {
                                 <X size={28} />
                             </button>
                         </div>
-                        <form onSubmit={handleSave} className="p-10 space-y-10">
+                        <form onSubmit={handleSave} className="p-6 md:p-10 space-y-10 overflow-y-auto">
                             <div className="space-y-4">
                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Numéro de table</label>
                                 <input

@@ -349,9 +349,9 @@ export const MenuManagement: React.FC = () => {
 
             {/* Item Modal */}
             {showItemModal && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-6">
-                    <div className="bg-white w-full max-w-2xl rounded-[3rem] border border-gray-100 shadow-3xl overflow-hidden animate-in zoom-in duration-300">
-                        <div className="p-10 border-b border-gray-50 flex items-center justify-between">
+                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4 md:p-6">
+                    <div className="bg-white w-full max-w-2xl rounded-[2rem] md:rounded-[3rem] border border-gray-100 shadow-3xl overflow-hidden animate-in zoom-in duration-300 max-h-[90vh] flex flex-col">
+                        <div className="p-6 md:p-10 border-b border-gray-50 flex items-center justify-between shrink-0">
                             <h3 className="text-3xl font-black text-slate-900 italic tracking-tighter">
                                 {editingItem ? 'MODIFIER LE PLAT' : 'NOUVEAU PLAT'}
                             </h3>
@@ -359,7 +359,7 @@ export const MenuManagement: React.FC = () => {
                                 <X size={28} />
                             </button>
                         </div>
-                        <form onSubmit={handleSaveItem} className="p-10 space-y-8">
+                        <form onSubmit={handleSaveItem} className="p-6 md:p-10 space-y-6 md:space-y-8 overflow-y-auto">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="space-y-3">
                                     <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest ml-4">Appelation du plat</label>
@@ -440,9 +440,9 @@ export const MenuManagement: React.FC = () => {
 
             {/* Cat Modal */}
             {showCatModal && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-6">
-                    <div className="bg-white w-full max-w-md rounded-[3rem] border border-gray-100 shadow-3xl overflow-hidden animate-in zoom-in duration-300">
-                        <div className="p-10 border-b border-gray-50 flex items-center justify-between">
+                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4 md:p-6">
+                    <div className="bg-white w-full max-w-md rounded-[2rem] md:rounded-[3rem] border border-gray-100 shadow-3xl overflow-hidden animate-in zoom-in duration-300 max-h-[90vh] flex flex-col">
+                        <div className="p-6 md:p-10 border-b border-gray-50 flex items-center justify-between shrink-0">
                             <h3 className="text-2xl font-black text-slate-900 italic tracking-tighter uppercase">
                                 {editingCat ? 'MODIFIER CATÉGORIE' : 'NOUVELLE CATÉGORIE'}
                             </h3>
@@ -450,7 +450,7 @@ export const MenuManagement: React.FC = () => {
                                 <X size={28} />
                             </button>
                         </div>
-                        <form onSubmit={handleSaveCategory} className="p-10 space-y-8">
+                        <form onSubmit={handleSaveCategory} className="p-6 md:p-10 space-y-6 md:space-y-8 overflow-y-auto">
                             <div className="space-y-3">
                                 <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest ml-4">Nom de la catégorie</label>
                                 <input

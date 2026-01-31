@@ -120,58 +120,61 @@ export const RestaurantManagement: React.FC = () => {
             {/* Add Modal */}
             {showAddModal && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
-                    <div className="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl animate-in zoom-in duration-200 border border-gray-100">
-                        <div className="flex items-center justify-between mb-8">
+                    <div className="bg-white rounded-[2rem] md:rounded-3xl w-full max-w-md shadow-2xl animate-in zoom-in duration-200 border border-gray-100 flex flex-col max-h-[90vh] overflow-hidden">
+                        <div className="flex items-center justify-between p-6 md:p-8 border-b border-gray-50 shrink-0">
                             <h2 className="text-2xl font-black text-gray-900 italic underline decoration-blue-600 underline-offset-8">Nouveau Restaurant</h2>
                             <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
                                 <Plus size={24} className="rotate-45 text-gray-400" />
                             </button>
                         </div>
 
-                        <form onSubmit={handleCreate} className="space-y-6">
-                            <div className="space-y-2">
-                                <label className="block text-xs font-black text-gray-900 uppercase tracking-[0.2em] ml-1">Nom de l'établissement</label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={newRes.name}
-                                    onChange={e => setNewRes({ ...newRes, name: e.target.value })}
-                                    className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-600 focus:bg-white focus:outline-none transition-all font-bold text-gray-900 placeholder:text-gray-400 shadow-sm"
-                                    placeholder="ex: Le Petit Bistro"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="block text-xs font-black text-gray-900 uppercase tracking-[0.2em] ml-1">Lien personnalisé (Slug)</label>
-                                <div className="relative">
-                                    <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 font-bold">/</span>
+                        <div className="p-6 md:p-8 overflow-y-auto">
+
+                            <form onSubmit={handleCreate} className="space-y-6">
+                                <div className="space-y-2">
+                                    <label className="block text-xs font-black text-gray-900 uppercase tracking-[0.2em] ml-1">Nom de l'établissement</label>
                                     <input
                                         type="text"
                                         required
-                                        value={newRes.slug}
-                                        onChange={e => setNewRes({ ...newRes, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
-                                        className="w-full pl-9 pr-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-600 focus:bg-white focus:outline-none transition-all font-bold text-gray-900 placeholder:text-gray-400 shadow-sm"
-                                        placeholder="ex: petit-bistro"
+                                        value={newRes.name}
+                                        onChange={e => setNewRes({ ...newRes, name: e.target.value })}
+                                        className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-600 focus:bg-white focus:outline-none transition-all font-bold text-gray-900 placeholder:text-gray-400 shadow-sm"
+                                        placeholder="ex: Le Petit Bistro"
                                     />
                                 </div>
-                                <p className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-wider ml-1">C'est le nom qui apparaîtra dans l'URL de votre menu.</p>
-                            </div>
+                                <div className="space-y-2">
+                                    <label className="block text-xs font-black text-gray-900 uppercase tracking-[0.2em] ml-1">Lien personnalisé (Slug)</label>
+                                    <div className="relative">
+                                        <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 font-bold">/</span>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={newRes.slug}
+                                            onChange={e => setNewRes({ ...newRes, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
+                                            className="w-full pl-9 pr-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-600 focus:bg-white focus:outline-none transition-all font-bold text-gray-900 placeholder:text-gray-400 shadow-sm"
+                                            placeholder="ex: petit-bistro"
+                                        />
+                                    </div>
+                                    <p className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-wider ml-1">C'est le nom qui apparaîtra dans l'URL de votre menu.</p>
+                                </div>
 
-                            <div className="flex space-x-4 pt-6">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowAddModal(false)}
-                                    className="flex-1 px-6 py-4 border-2 border-gray-100 text-gray-500 rounded-2xl font-black hover:bg-gray-50 transition-all active:scale-[0.98]"
-                                >
-                                    Annuler
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="flex-1 px-6 py-4 bg-blue-600 text-white rounded-2xl font-black hover:bg-blue-700 shadow-xl shadow-blue-500/20 transition-all active:scale-[0.98]"
-                                >
-                                    Créer
-                                </button>
-                            </div>
-                        </form>
+                                <div className="flex space-x-4 pt-6">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowAddModal(false)}
+                                        className="flex-1 px-6 py-4 border-2 border-gray-100 text-gray-500 rounded-2xl font-black hover:bg-gray-50 transition-all active:scale-[0.98]"
+                                    >
+                                        Annuler
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="flex-1 px-6 py-4 bg-blue-600 text-white rounded-2xl font-black hover:bg-blue-700 shadow-xl shadow-blue-500/20 transition-all active:scale-[0.98]"
+                                    >
+                                        Créer
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             )}

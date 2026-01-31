@@ -374,14 +374,14 @@ export const PublicMenu: React.FC = () => {
             {/* Table Selection Modal */}
             {showTableModal && (
                 <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-                    <div className={`w-full max-w-sm rounded-3xl p-8 shadow-2xl ${isBgLight ? 'bg-white' : 'bg-slate-900 border border-slate-800'}`}>
-                        <div className="flex justify-between items-center mb-6">
+                    <div className={`w-full max-w-sm rounded-3xl p-6 md:p-8 shadow-2xl flex flex-col max-h-[90vh] ${isBgLight ? 'bg-white' : 'bg-slate-900 border border-slate-800'}`}>
+                        <div className="flex justify-between items-center mb-6 shrink-0">
                             <h3 className={`text-xl font-bold`}>Numéro de table</h3>
                             <button onClick={() => setShowTableModal(false)} className={`p-2 rounded-full hover:bg-slate-100 ${isBgLight ? 'hover:bg-slate-100' : 'hover:bg-slate-800'}`}>
                                 <X size={20} />
                             </button>
                         </div>
-                        <div className="grid grid-cols-4 gap-3">
+                        <div className="grid grid-cols-4 gap-3 overflow-y-auto min-h-0">
                             {tables.map(t => (
                                 <button
                                     key={t.id}

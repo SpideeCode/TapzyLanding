@@ -335,38 +335,42 @@ export const MenuManagement: React.FC = () => {
             {/* Category Modal */}
             {showCatModal && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl animate-in zoom-in duration-200">
-                        <h3 className="text-2xl font-black text-gray-900 mb-6 italic underline decoration-blue-600 underline-offset-8">
-                            {editingCat ? 'Modifier la catégorie' : 'Nouvelle catégorie'}
-                        </h3>
-                        <form onSubmit={handleSaveCategory} className="space-y-6">
-                            <div>
-                                <label className="block text-sm font-black text-gray-700 mb-2 uppercase tracking-widest">Nom de la catégorie</label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={catName}
-                                    onChange={e => setCatName(e.target.value)}
-                                    className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-600 focus:bg-white focus:outline-none transition-all font-bold text-gray-900 placeholder:text-gray-400"
-                                    placeholder="ex: Entrées, Plats, Desserts..."
-                                />
-                            </div>
-                            <div className="flex space-x-4 pt-4">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowCatModal(false)}
-                                    className="flex-1 px-6 py-4 border-2 border-gray-100 text-gray-500 rounded-2xl font-black hover:bg-gray-50 transition-all active:scale-[0.98]"
-                                >
-                                    Annuler
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="flex-1 px-6 py-4 bg-blue-600 text-white rounded-2xl font-black hover:bg-blue-700 shadow-xl shadow-blue-500/20 transition-all active:scale-[0.98]"
-                                >
-                                    Enregistrer
-                                </button>
-                            </div>
-                        </form>
+                    <div className="bg-white rounded-[2rem] md:rounded-3xl w-full max-w-md shadow-2xl animate-in zoom-in duration-200 flex flex-col max-h-[90vh] overflow-hidden">
+                        <div className="p-6 md:p-8 border-b border-gray-50 flex justify-between items-center shrink-0">
+                            <h3 className="text-2xl font-black text-gray-900 italic underline decoration-blue-600 underline-offset-8">
+                                {editingCat ? 'Modifier la catégorie' : 'Nouvelle catégorie'}
+                            </h3>
+                        </div>
+                        <div className="p-6 md:p-8 overflow-y-auto">
+                            <form onSubmit={handleSaveCategory} className="space-y-6">
+                                <div>
+                                    <label className="block text-sm font-black text-gray-700 mb-2 uppercase tracking-widest">Nom de la catégorie</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={catName}
+                                        onChange={e => setCatName(e.target.value)}
+                                        className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-600 focus:bg-white focus:outline-none transition-all font-bold text-gray-900 placeholder:text-gray-400"
+                                        placeholder="ex: Entrées, Plats, Desserts..."
+                                    />
+                                </div>
+                                <div className="flex space-x-4 pt-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowCatModal(false)}
+                                        className="flex-1 px-6 py-4 border-2 border-gray-100 text-gray-500 rounded-2xl font-black hover:bg-gray-50 transition-all active:scale-[0.98]"
+                                    >
+                                        Annuler
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="flex-1 px-6 py-4 bg-blue-600 text-white rounded-2xl font-black hover:bg-blue-700 shadow-xl shadow-blue-500/20 transition-all active:scale-[0.98]"
+                                    >
+                                        Enregistrer
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             )}
@@ -374,64 +378,68 @@ export const MenuManagement: React.FC = () => {
             {/* Item Modal */}
             {showItemModal && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl animate-in zoom-in duration-200">
-                        <h3 className="text-2xl font-black text-gray-900 mb-6 italic underline decoration-blue-600 underline-offset-8">
-                            {editingItem ? 'Modifier le plat' : 'Nouveau plat'}
-                        </h3>
-                        <form onSubmit={handleSaveItem} className="space-y-6">
-                            <div>
-                                <label className="block text-sm font-black text-gray-700 mb-2 uppercase tracking-widest">Nom du plat</label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={itemName}
-                                    onChange={e => setItemName(e.target.value)}
-                                    className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-600 focus:bg-white focus:outline-none transition-all font-bold text-gray-900"
-                                    placeholder="ex: Burger Maison"
-                                />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white rounded-[2rem] md:rounded-3xl w-full max-w-md shadow-2xl animate-in zoom-in duration-200 flex flex-col max-h-[90vh] overflow-hidden">
+                        <div className="p-6 md:p-8 border-b border-gray-50 flex justify-between items-center shrink-0">
+                            <h3 className="text-2xl font-black text-gray-900 italic underline decoration-blue-600 underline-offset-8">
+                                {editingItem ? 'Modifier le plat' : 'Nouveau plat'}
+                            </h3>
+                        </div>
+                        <div className="p-6 md:p-8 overflow-y-auto">
+                            <form onSubmit={handleSaveItem} className="space-y-6">
                                 <div>
-                                    <label className="block text-sm font-black text-gray-700 mb-2 uppercase tracking-widest">Prix (€)</label>
+                                    <label className="block text-sm font-black text-gray-700 mb-2 uppercase tracking-widest">Nom du plat</label>
                                     <input
-                                        type="number"
-                                        step="0.01"
+                                        type="text"
                                         required
-                                        value={itemPrice}
-                                        onChange={e => setItemPrice(e.target.value)}
+                                        value={itemName}
+                                        onChange={e => setItemName(e.target.value)}
                                         className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-600 focus:bg-white focus:outline-none transition-all font-bold text-gray-900"
+                                        placeholder="ex: Burger Maison"
                                     />
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-black text-gray-700 mb-2 uppercase tracking-widest">Catégorie</label>
-                                    <select
-                                        value={itemCatId}
-                                        onChange={e => setItemCatId(e.target.value)}
-                                        className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-600 focus:bg-white focus:outline-none transition-all font-bold text-gray-900"
-                                    >
-                                        <option value="">Sans catégorie</option>
-                                        {categories.map((cat: Category) => (
-                                            <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                        ))}
-                                    </select>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-black text-gray-700 mb-2 uppercase tracking-widest">Prix (€)</label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            required
+                                            value={itemPrice}
+                                            onChange={e => setItemPrice(e.target.value)}
+                                            className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-600 focus:bg-white focus:outline-none transition-all font-bold text-gray-900"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-black text-gray-700 mb-2 uppercase tracking-widest">Catégorie</label>
+                                        <select
+                                            value={itemCatId}
+                                            onChange={e => setItemCatId(e.target.value)}
+                                            className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-600 focus:bg-white focus:outline-none transition-all font-bold text-gray-900"
+                                        >
+                                            <option value="">Sans catégorie</option>
+                                            {categories.map((cat: Category) => (
+                                                <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="flex space-x-4 pt-4">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowItemModal(false)}
-                                    className="flex-1 px-6 py-4 border-2 border-gray-100 text-gray-500 rounded-2xl font-black hover:bg-gray-50 transition-all active:scale-[0.98]"
-                                >
-                                    Annuler
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="flex-1 px-6 py-4 bg-blue-600 text-white rounded-2xl font-black hover:bg-blue-700 shadow-xl shadow-blue-500/20 transition-all active:scale-[0.98]"
-                                >
-                                    Enregistrer
-                                </button>
-                            </div>
-                        </form>
+                                <div className="flex space-x-4 pt-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowItemModal(false)}
+                                        className="flex-1 px-6 py-4 border-2 border-gray-100 text-gray-500 rounded-2xl font-black hover:bg-gray-50 transition-all active:scale-[0.98]"
+                                    >
+                                        Annuler
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="flex-1 px-6 py-4 bg-blue-600 text-white rounded-2xl font-black hover:bg-blue-700 shadow-xl shadow-blue-500/20 transition-all active:scale-[0.98]"
+                                    >
+                                        Enregistrer
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             )}

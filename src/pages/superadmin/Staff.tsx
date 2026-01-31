@@ -158,97 +158,99 @@ export const StaffManagement: React.FC = () => {
             {/* Add Account Modal */}
             {showAddModal && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[70] p-4">
-                    <div className="bg-white rounded-[2.5rem] w-full max-w-lg p-10 shadow-2xl animate-in zoom-in duration-200 border border-gray-100">
-                        <div className="flex items-center justify-between mb-8">
+                    <div className="bg-white rounded-[2.5rem] w-full max-w-lg shadow-2xl animate-in zoom-in duration-200 border border-gray-100 flex flex-col max-h-[90vh] overflow-hidden">
+                        <div className="flex items-center justify-between p-6 md:p-10 border-b border-gray-50 shrink-0">
                             <h3 className="text-3xl font-black text-gray-900 italic underline decoration-blue-600 underline-offset-8 uppercase tracking-tighter">Créer un profil</h3>
                             <button onClick={() => setShowAddModal(false)} className="p-3 hover:bg-gray-100 rounded-2xl transition-colors">
                                 <X size={24} className="text-gray-400" strokeWidth={3} />
                             </button>
                         </div>
 
-                        {message && (
-                            <div className={`mb-8 p-5 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2 ${message.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-red-50 text-red-700 border border-red-100'
-                                }`}>
-                                {message.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
-                                <p className="text-xs font-bold italic">{message.text}</p>
-                            </div>
-                        )}
-
-                        <form onSubmit={handleCreateUser} className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Email</label>
-                                    <input
-                                        type="email"
-                                        required
-                                        value={email}
-                                        onChange={e => setEmail(e.target.value)}
-                                        className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-600 focus:bg-white rounded-2xl outline-none font-bold text-gray-900 transition-all"
-                                        placeholder="admin@sofra.be"
-                                    />
+                        <div className="overflow-y-auto p-6 md:p-10">
+                            {message && (
+                                <div className={`mb-8 p-5 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2 ${message.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-red-50 text-red-700 border border-red-100'
+                                    }`}>
+                                    {message.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
+                                    <p className="text-xs font-bold italic">{message.text}</p>
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Mot de passe</label>
-                                    <input
-                                        type="password"
-                                        required
-                                        value={password}
-                                        onChange={e => setPassword(e.target.value)}
-                                        className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-600 focus:bg-white rounded-2xl outline-none font-bold text-gray-900 transition-all"
-                                        placeholder="********"
-                                    />
-                                </div>
-                            </div>
+                            )}
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Rôle</label>
-                                    <select
-                                        value={role}
-                                        onChange={e => setRole(e.target.value as any)}
-                                        className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-600 focus:bg-white rounded-2xl outline-none font-bold text-gray-900 transition-all appearance-none"
+                            <form onSubmit={handleCreateUser} className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Email</label>
+                                        <input
+                                            type="email"
+                                            required
+                                            value={email}
+                                            onChange={e => setEmail(e.target.value)}
+                                            className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-600 focus:bg-white rounded-2xl outline-none font-bold text-gray-900 transition-all"
+                                            placeholder="admin@sofra.be"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Mot de passe</label>
+                                        <input
+                                            type="password"
+                                            required
+                                            value={password}
+                                            onChange={e => setPassword(e.target.value)}
+                                            className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-600 focus:bg-white rounded-2xl outline-none font-bold text-gray-900 transition-all"
+                                            placeholder="********"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Rôle</label>
+                                        <select
+                                            value={role}
+                                            onChange={e => setRole(e.target.value as any)}
+                                            className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-600 focus:bg-white rounded-2xl outline-none font-bold text-gray-900 transition-all appearance-none"
+                                        >
+                                            <option value="admin">Administrateur</option>
+                                            <option value="staff">Serveur / Staff</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Restaurant</label>
+                                        <select
+                                            required
+                                            value={selectedResId}
+                                            onChange={e => setSelectedResId(e.target.value)}
+                                            className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-600 focus:bg-white rounded-2xl outline-none font-bold text-gray-900 transition-all appearance-none"
+                                        >
+                                            {restaurants.map(res => (
+                                                <option key={res.id} value={res.id}>{res.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="flex space-x-4 pt-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowAddModal(false)}
+                                        className="flex-1 px-6 py-4 border-2 border-gray-100 text-gray-400 rounded-2xl font-black hover:bg-gray-50 transition-all uppercase tracking-widest text-[10px]"
                                     >
-                                        <option value="admin">Administrateur</option>
-                                        <option value="staff">Serveur / Staff</option>
-                                    </select>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Restaurant</label>
-                                    <select
-                                        required
-                                        value={selectedResId}
-                                        onChange={e => setSelectedResId(e.target.value)}
-                                        className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-600 focus:bg-white rounded-2xl outline-none font-bold text-gray-900 transition-all appearance-none"
+                                        Fermer
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={creating}
+                                        className="flex-[2] bg-blue-600 text-white px-6 py-4 rounded-2xl font-black hover:bg-blue-700 shadow-xl shadow-blue-500/20 transition-all active:scale-[0.98] uppercase tracking-widest text-[10px] flex items-center justify-center gap-2"
                                     >
-                                        {restaurants.map(res => (
-                                            <option key={res.id} value={res.id}>{res.name}</option>
-                                        ))}
-                                    </select>
+                                        {creating ? (
+                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                        ) : (
+                                            <UserPlus size={16} />
+                                        )}
+                                        {creating ? 'CRÉATION...' : 'CRÉER LE COMPTE'}
+                                    </button>
                                 </div>
-                            </div>
-
-                            <div className="flex space-x-4 pt-4">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowAddModal(false)}
-                                    className="flex-1 px-6 py-4 border-2 border-gray-100 text-gray-400 rounded-2xl font-black hover:bg-gray-50 transition-all uppercase tracking-widest text-[10px]"
-                                >
-                                    Fermer
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={creating}
-                                    className="flex-[2] bg-blue-600 text-white px-6 py-4 rounded-2xl font-black hover:bg-blue-700 shadow-xl shadow-blue-500/20 transition-all active:scale-[0.98] uppercase tracking-widest text-[10px] flex items-center justify-center gap-2"
-                                >
-                                    {creating ? (
-                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                    ) : (
-                                        <UserPlus size={16} />
-                                    )}
-                                    {creating ? 'CRÉATION...' : 'CRÉER LE COMPTE'}
-                                </button>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
                 </div>
             )}
