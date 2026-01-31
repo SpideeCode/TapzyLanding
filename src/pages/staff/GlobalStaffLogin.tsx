@@ -17,15 +17,19 @@ export const GlobalStaffLogin = () => {
         setError('');
 
         try {
+            // Normalize slug: lowercase and replace special chars/spaces with hyphens
+            const normalizedSlug = slug.toLowerCase().replace(/[^a-z0-9]/g, '-');
+
             const { data, error } = await supabase
                 .from('restaurants')
                 .select('slug, name')
-                .eq('slug', slug.trim().toLowerCase())
+                .eq('slug', normalizedSlug)
                 .single();
 
             if (error || !data) {
                 setError('Restaurant introuvable');
             } else {
+                setSlug(data.slug); // Confirm slug from DB (e.g. "wyngs")
                 setStep(2); // Move to PIN entry
             }
         } catch (err) {
@@ -49,11 +53,11 @@ export const GlobalStaffLogin = () => {
             if (rpcError) throw rpcError;
 
             if (data.success) {
-                sessionStorage.setItem(`staff_session_${slug}`, JSON.stringify({
+                sessionStorage.setItem(`staff_session_${slug.toLowerCase()}`, JSON.stringify({
                     timestamp: new Date().toISOString(),
                     restaurantId: data.restaurant.id
                 }));
-                navigate(`/staff/${slug}`);
+                navigate(`/staff/${slug.toLowerCase()}`);
             } else {
                 setError('Code d\'accès invalide');
             }
