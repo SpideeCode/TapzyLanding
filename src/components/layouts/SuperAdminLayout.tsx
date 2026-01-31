@@ -3,13 +3,9 @@ import { Link, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard,
     Store,
-    Users,
     Menu as MenuIcon,
     X,
-    LogOut,
-    Settings,
-    Coffee,
-    QrCode
+    LogOut
 } from 'lucide-react';
 
 import { supabase } from '../../lib/supabase';
@@ -21,10 +17,6 @@ interface SuperAdminLayoutProps {
 const navigation = [
     { name: 'Tableau de bord', href: '/superadmin', icon: LayoutDashboard },
     { name: 'Restaurants', href: '/superadmin/restaurants', icon: Store },
-    { name: 'Staff & Comptes', href: '/superadmin/staff', icon: Users },
-    { name: 'Config. Menus', href: '/superadmin/menus', icon: Coffee },
-    { name: 'Gestion Tables', href: '/superadmin/tables', icon: QrCode },
-    { name: 'Paramètres', href: '/superadmin/settings', icon: Settings },
 ];
 
 export const SuperAdminLayout: React.FC<SuperAdminLayoutProps> = ({ children }) => {
